@@ -20,13 +20,15 @@ public class ReasonableCare {
 		close();
 	}
 
+
 	private void createPerson(int id, String name, int age, char gender, String phone, String address) {
 		try {
 			statement.executeUpdate("INSERT INTO person(id, name, age, gender, phone_num, address) VALUES (" + id + ", " + name + ", " + age + ", " + gender + ", " + phone + ", " + address +")");
 		} catch (SQLException e) {}
 
 	}
-	private void createStudentAccount(int id, String name, int age, char gender, String phone, String address, String dateOfBirth, String ssn, int vacc) {
+	private void createStaff() {}
+	private void createStudent(int id, String name, int age, char gender, String phone, String address, String dateOfBirth, String ssn, int vacc) {
 		try {
 			createPerson(id, name, age, gender, phone, address);
 			statement.executeUpdate("INSERT INTO student(id, date_of_birth, ssn, vacc) VALUES (" + id + ", to_date(" + dateOfBirth + ", 'DD-MON-YYYY'), " +ssn + "," + vacc + ")");
@@ -40,7 +42,6 @@ public class ReasonableCare {
 			statement = connection.createStatement();
 
 			try {
-				/* DROP TABLES */
 				statement.executeUpdate("DROP TABLE medical_record ");
 			} catch (SQLException e) {}
 			try {

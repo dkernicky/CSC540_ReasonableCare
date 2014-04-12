@@ -3,6 +3,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Scanner;
 
 public class ReasonableCare {
 	private static final String jdbcURL = "jdbc:oracle:thin:@ora.csc.ncsu.edu:1521:orcl";
@@ -16,24 +17,107 @@ public class ReasonableCare {
 
 	public static void main(String[] args) {
 		initialize();
-
+		start();
 		close();
 	}
-
-
+	
+	
+	public static void start() {
+		Scanner scan = new Scanner(System.in);
+		
+		System.out.println("Welcome to the Reasonable Care Database System \nPlease enter your login id:");
+		String loginID = scan.nextLine();
+		System.out.println("Please enter your password:");
+		String loginPwd = scan.nextLine();
+	}
+	
+	// **********************************************************
+	// ** Manage User Accounts **
+	
+	// create a person in the db
 	private void createPerson(int id, String name, int age, char gender, String phone, String address) {
 		try {
 			statement.executeUpdate("INSERT INTO person(id, name, age, gender, phone_num, address) VALUES (" + id + ", " + name + ", " + age + ", " + gender + ", " + phone + ", " + address +")");
 		} catch (SQLException e) {}
-
 	}
-	private void createStaff() {}
-	private void createStudent(int id, String name, int age, char gender, String phone, String address, String dateOfBirth, String ssn, int vacc) {
+	
+	// create a staff member in the db
+	private void createStaff(int id, char jobTitle, String department) {
 		try {
-			createPerson(id, name, age, gender, phone, address);
+			statement.executeUpdate("INSERT INTO staff(id, job_title, department) VALUES (" + 10001 + ", " + jobTitle + "," + department + ")");
+		} catch (SQLException e) {}
+	}
+	
+	// create a doctor in the db
+	private void createDoctor(int id, String name, int age, char gender, char jobTitle, String profTitle, String department, String phone, String address) {
+		createPerson(id, name, age, gender, phone, address);
+		createStaff(id, jobTitle, department);
+		try {
+			statement.executeUpdate("INSERT INTO doctor(id, professional_title) VALUES (" + id + ", " + profTitle + ")");
+		} catch (SQLException e) {}
+	}
+	
+	// create a student
+	private void createStudent(int id, String name, int age, char gender, String phone, String address, String dateOfBirth, String ssn, int vacc) {
+		createPerson(id, name, age, gender, phone, address);
+		try {
 			statement.executeUpdate("INSERT INTO student(id, date_of_birth, ssn, vacc) VALUES (" + id + ", to_date(" + dateOfBirth + ", 'DD-MON-YYYY'), " +ssn + "," + vacc + ")");
 		} catch (SQLException e) {}
 	}
+	private void createInsuranceInfo(int studentID, String insName, String policyNum, String start, String end, float copayment) throws SQLException {
+		statement.executeUpdate("INSERT INTO health_insurance(s_id, ins_name, policy_num, start_date, end_date, copayment) VALUES (" + studentID + ", " + insName + ", " + policyNum + ",  to_date(" + start + ", 'DD-MON-YYYY'), to_date(" + end + ", 'DD-MON-YYYY'), " + copayment + ")");
+
+	}
+	
+	// create an appointment
+	private void createAppointment(int id, int studentID, int staffID, String reason, String date, String start, String end, float amt, String notes) {
+		//TODO what about the sequence auto-increment for ID?
+		try {
+			statement.executeUpdate("INSERT INTO appointment(id, s_id, staff_id, reason, appt_date, start_time, end_time, amt_billed, notes) VALUES (" + id + ", " + studentID + ", " + staffID + ", " + reason + ",  to_date(" + date + ", 'DD-MON-YYYY'), to_date(" + start + ", 'HH:MIPM'), to_date(" + end + ", 'HH:MIPM')," + amt + ", " + notes + ")");
+		} catch (SQLException e) {}
+	}
+	
+	private void updateStudent(int id, String name, int age, char gender, String phone, String address, String dateOfBirth, String ssn, int vacc) throws SQLException {
+		updatePerson(id, name, age, gender, phone, address);
+		statement.executeUpdate("UPDATE student set date_of_birth =  to_date(" + dateOfBirth + ", 'DD-MON-YYYY'), ssn = " + ssn + ", vacc = " + vacc + "WHERE id = " + id);
+	}
+	private void updatePerson(int id, String name, int age, char gender, String phone, String address) throws SQLException {
+		statement.executeUpdate("UPDATE person set name= " + name + ", age = " + age + ", gender = " + gender + ", phone = " + phone + ", address = " + address + "WHERE id = " + id);
+	}
+	private void updateStaff(int id, String name, int age, char gender, String phone, String address, char jobTitle, String department) throws SQLException {
+		updatePerson(id, name, age, gender, phone, address);
+		statement.executeUpdate("UPDATE staff set jobTitle = " + jobTitle + ", department = " + department + "WHERE id = " + id);
+	}
+	private void updateDoctor(int id, String name, int age, char gender, String phone, String address, char jobTitle, String department, String profTitle) throws SQLException {
+		updateStaff(id, name, age, gender, phone, address, jobTitle, department);
+		statement.executeUpdate("UPDATE doctor set professional_title = " + profTitle + "WHERE id= " + id);
+	}
+	
+	private void updateInsuranceInfo(int studentID, String insName, String policyNum, String start, String end, float copayment) throws SQLException {
+		statement.executeUpdate("UPDATE health_insurance set ins_name = " + insName + ", policy_num = " + policyNum + ", start_date = " + start + ", end_date =" + end + ", copayment = " + copayment + " WHERE s_id = " + studentID);
+	}
+	
+	private void updateAppointment(int id, int studentID, int staffID, String reason, String date, String start, String end, float amt, String notes) throws SQLException {
+		statement.executeUpdate("UPDATE appointment set reason = " + reason + ", appt_date =  to_date(" + date + ", 'DD-MON-YYYY'), start_time =  to_date(" + start + ", 'HH:MIPM'), end_time =  to_date(" + end + ", 'HH:MIPM'), amt = " + amt + ", notes = " + notes + "WHERE id = " + id );
+	}
+	
+	private void viewAppointmentInfo() {
+	
+	}
+	
+	// determine if all vaccinations have been completed by the end of the first semester
+	private void showHolds(int studentID) throws SQLException {
+		result = statement.executeQuery("SELECT * FROM STUDENT WHERE id = " + studentID);
+		
+		if(result.next()) {
+			if(result.getInt("vacc") < 3) {
+				System.out.println("Holds: Vaccinations Are Behind");
+			}
+		}
+	}
+	
+	// ** End Manage User Accounts
+	// **********************************************************
 	
 	//methods for making or cancelling appointments with doctors
 	

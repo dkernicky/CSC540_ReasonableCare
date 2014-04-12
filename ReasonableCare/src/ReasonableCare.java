@@ -62,25 +62,39 @@ public class ReasonableCare {
 		} catch (SQLException e) {}
 	}
 	
-	private void updateStudent() {
-		
+	private void updateStudent(int id, String name, int age, char gender, String phone, String address, String dateOfBirth, String ssn, int vacc) throws SQLException {
+		updatePerson(id, name, age, gender, phone, address);
+		statement.executeUpdate("UPDATE student set date_of_birth = " + dateOfBirth + ", ssn = " + ssn + ", vacc = " + vacc + "WHERE id = " + id);
+	}
+	private void updatePerson(int id, String name, int age, char gender, String phone, String address) throws SQLException {
+		statement.executeUpdate("UPDATE person set name= " + name + ", age = " + age + ", gender = " + gender + ", phone = " + phone + ", address = " + address + "WHERE id = " + id);
+	}
+	private void updateStaff(int id, String name, int age, char gender, String phone, String address, char jobTitle, String department) throws SQLException {
+		updatePerson(id, name, age, gender, phone, address);
+		statement.executeUpdate("UPDATE staff set jobTitle = " + jobTitle + ", department = " + department + "WHERE id = " + id);
+	}
+	private void updateDoctor(int id, String name, int age, char gender, String phone, String address, char jobTitle, String department, String profTitle) throws SQLException {
+		updateStaff(id, name, age, gender, phone, address, jobTitle, department);
+		statement.executeUpdate("UPDATE doctor set professional_title = " + profTitle + "WHERE id= " + id);
 	}
 	
-	private void updateDoctor() {
-		
-	}
-	
-	private void updateAppointment() {
-		
+	private void updateAppointment(int id, int studentID, int staffID, String reason, String date, String start, String end, float amt, String notes) throws SQLException {
+		statement.executeUpdate("UPDATE appointment set reason = " + reason + ", appt_date = " + date + ", start_time = " + start + ", end_time = " + end + ", amt = " + amt + ", notes = " + notes + "WHERE id = " + id );
 	}
 	
 	private void viewAppointmentInfo() {
-		
+	
 	}
 	
 	// determine if all vaccinations have been completed by the end of the first semester
-	private void showHolds(int studentID) {
+	private void showHolds(int studentID) throws SQLException {
+		result = statement.executeQuery("SELECT * FROM STUDENT WHERE id = " + studentID);
 		
+		if(result.next()) {
+			if(result.getInt("vacc") < 3) {
+				System.out.println("Holds: Vaccinations Are Behind");
+			}
+		}
 	}
 	
 	// ** End Manage User Accounts

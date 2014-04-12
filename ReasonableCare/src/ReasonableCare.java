@@ -121,6 +121,19 @@ public class ReasonableCare {
 	
 	//methods for making or cancelling appointments with doctors
 	
+	private void studentSearchForSpecialist(String specialization){
+		try{
+			String query = "SELECT person.name as name, staff.department as specialization, " +
+					"doctor_schedule.days_available as available FROM ((staff INNER JOIN person ON "+
+					"staff.id=person.id) INNER JOIN doctor_schedule ON doctor_schedule.d_id=staff.id) WHERE specialization='" + specialization + "';";
+			result = statement.executeQuery(query);
+			while(result.next()){
+				System.out.println();
+			}
+		} catch(SQLException e) {}
+	}
+	
+	
 	private void searchForSpecialist(String specialization){
 		try{
 			String query = "SELECT person.name as name, staff.department as specialization, " +

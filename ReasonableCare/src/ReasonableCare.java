@@ -35,6 +35,60 @@ public class ReasonableCare {
 		} catch (SQLException e) {}
 	}
 	
+	//methods for making or cancelling appointments with doctors
+	
+	private void searchForSpecialist(String specialization){
+		try{
+			String query = "SELECT person.name as name, staff.department as specialization, " +
+					"person.phone_num as phone FROM staff INNER JOIN person ON "+
+					"staff.id=person.id WHERE specialization='" + specialization + "';";
+			result = statement.executeQuery(query);
+			while(result.next()){
+				System.out.println();
+			}
+		} catch(SQLException e) {}
+	}
+	
+	private void viewStudentAppointments(int student_id){
+		try{
+			String query = "SELECT * FROM appointment WHERE student_id=" + student_id + ";";
+			result = statement.executeQuery(query);
+			while(result.next()){
+				System.out.println();
+			}
+		} catch(SQLException e) {}
+	}
+	
+	private void viewDoctorAppointments(int doctor_id){
+		try{
+			String query = "SELECT * FROM appointment WHERE doctor_id=" + doctor_id + ";";
+			result = statement.executeQuery(query);
+			while(result.next()){
+				System.out.println();
+			}
+		} catch(SQLException e) {}
+	}
+	
+	private void cancelAppointment(int student_id, String date, String start_time, String time_of_day){
+		try{
+			String update = "DELETE FROM appointment WHERE student_id=" + student_id +
+					" AND appt_date=to_date('" + date + "', 'DD-MON-YYYY') AND start_time=" +
+					"to_date('" + start_time + time_of_day + "', 'HH:MI" + time_of_day + "')";
+			statement.executeUpdate(update);
+		} catch(SQLException e) {}
+	}
+	
+	private void displayVaccinations(int student_id){
+		try{
+			String query = "SELECT * FROM appointment WHERE reason='Vaccination' AND " +
+					"student_id=" + student_id + ";";
+			result = statement.executeQuery(query);
+			while(result.next()){
+				System.out.println();
+			}
+		} catch(SQLException e) {}
+	}
+	
 	private static void initialize() {
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");

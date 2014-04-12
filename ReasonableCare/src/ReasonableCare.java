@@ -19,51 +19,57 @@ public class ReasonableCare {
 
 		close();
 	}
-
+	
+	// **********************************************************
 	// ** Manage User Accounts **
+	
+	// create a person in the db
 	private void createPerson(int id, String name, int age, char gender, String phone, String address) {
 		try {
 			statement.executeUpdate("INSERT INTO person(id, name, age, gender, phone_num, address) VALUES (" + id + ", " + name + ", " + age + ", " + gender + ", " + phone + ", " + address +")");
 		} catch (SQLException e) {}
-
 	}
+	
+	// create a staff member in the db
 	private void createStaff(int id, char jobTitle, String department) {
 		try {
 			statement.executeUpdate("INSERT INTO staff(id, job_title, department) VALUES (" + 10001 + ", " + jobTitle + "," + department + ")");
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		} catch (SQLException e) {}
 	}
+	
+	// create a doctor in the db
 	private void createDoctor(int id, String name, int age, char gender, char jobTitle, String profTitle, String department, String phone, String address) {
 		createPerson(id, name, age, gender, phone, address);
 		createStaff(id, jobTitle, department);
 		try {
 			statement.executeUpdate("INSERT INTO doctor(id, professional_title) VALUES (" + id + ", " + profTitle + ")");
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		} catch (SQLException e) {}
 	}
+	
+	// create a student
 	private void createStudent(int id, String name, int age, char gender, String phone, String address, String dateOfBirth, String ssn, int vacc) {
 		createPerson(id, name, age, gender, phone, address);
 		try {
 			statement.executeUpdate("INSERT INTO student(id, date_of_birth, ssn, vacc) VALUES (" + id + ", to_date(" + dateOfBirth + ", 'DD-MON-YYYY'), " +ssn + "," + vacc + ")");
 		} catch (SQLException e) {}
 	}
+	
+	// create an appointment
 	private void createAppointment(int id, int studentID, int staffID, String reason, String date, String start, String end, float amt, String notes) {
 		//TODO what about the sequence auto-increment for ID?
 		try {
 			statement.executeUpdate("INSERT INTO appointment(id, s_id, staff_id, reason, appt_date, start_time, end_time, amt_billed, notes) VALUES (" + id + ", " + studentID + ", " + staffID + ", " + reason + ",  to_date(" + date + ", 'DD-MON-YYYY'), to_date(" + start + ", 'HH:MIPM'), to_date(" + end + ", 'HH:MIPM')," + amt + ", " + notes + ")");
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		} catch (SQLException e) {}
 	}
 	
 	private void updateStudent() {
 		
 	}
+	
 	private void updateDoctor() {
 		
 	}
+	
 	private void updateAppointment() {
 		
 	}
@@ -71,10 +77,14 @@ public class ReasonableCare {
 	private void viewAppointmentInfo() {
 		
 	}
+	
+	// determine if all vaccinations have been completed by the end of the first semester
 	private void showHolds(int studentID) {
 		
 	}
+	
 	// ** End Manage User Accounts
+	// **********************************************************
 	
 	private static void initialize() {
 		try {

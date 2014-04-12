@@ -20,14 +20,15 @@ public class ReasonableCare {
 		close();
 	}
 
-
 	private void createPerson(int id, String name, int age, char gender, String phone, String address) {
 		try {
 			statement.executeUpdate("INSERT INTO person(id, name, age, gender, phone_num, address) VALUES (" + id + ", " + name + ", " + age + ", " + gender + ", " + phone + ", " + address +")");
 		} catch (SQLException e) {}
 
 	}
-	private void createStaff() {}
+	private void createStaff() {
+		// abcde
+	}
 	private void createStudent(int id, String name, int age, char gender, String phone, String address, String dateOfBirth, String ssn, int vacc) {
 		try {
 			createPerson(id, name, age, gender, phone, address);

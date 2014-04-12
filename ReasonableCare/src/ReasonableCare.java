@@ -3,6 +3,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Scanner;
 
 public class ReasonableCare {
 	private static final String jdbcURL = "jdbc:oracle:thin:@ora.csc.ncsu.edu:1521:orcl";
@@ -16,8 +17,18 @@ public class ReasonableCare {
 
 	public static void main(String[] args) {
 		initialize();
-
+		start();
 		close();
+	}
+	
+	
+	public static void start() {
+		Scanner scan = new Scanner(System.in);
+		
+		System.out.println("Welcome to the Reasonable Care Database System \nPlease enter your login id:");
+		String loginID = scan.nextLine();
+		System.out.println("Please enter your password:");
+		String loginPwd = scan.nextLine();
 	}
 	
 	// **********************************************************
@@ -53,6 +64,10 @@ public class ReasonableCare {
 			statement.executeUpdate("INSERT INTO student(id, date_of_birth, ssn, vacc) VALUES (" + id + ", to_date(" + dateOfBirth + ", 'DD-MON-YYYY'), " +ssn + "," + vacc + ")");
 		} catch (SQLException e) {}
 	}
+	private void createInsuranceInfo(int studentID, String insName, String policyNum, String start, String end, float copayment) throws SQLException {
+		statement.executeUpdate("INSERT INTO health_insurance(s_id, ins_name, policy_num, start_date, end_date, copayment) VALUES (" + studentID + ", " + insName + ", " + policyNum + ",  to_date(" + start + ", 'DD-MON-YYYY'), to_date(" + end + ", 'DD-MON-YYYY'), " + copayment + ")");
+
+	}
 	
 	// create an appointment
 	private void createAppointment(int id, int studentID, int staffID, String reason, String date, String start, String end, float amt, String notes) {
@@ -64,7 +79,7 @@ public class ReasonableCare {
 	
 	private void updateStudent(int id, String name, int age, char gender, String phone, String address, String dateOfBirth, String ssn, int vacc) throws SQLException {
 		updatePerson(id, name, age, gender, phone, address);
-		statement.executeUpdate("UPDATE student set date_of_birth = " + dateOfBirth + ", ssn = " + ssn + ", vacc = " + vacc + "WHERE id = " + id);
+		statement.executeUpdate("UPDATE student set date_of_birth =  to_date(" + dateOfBirth + ", 'DD-MON-YYYY'), ssn = " + ssn + ", vacc = " + vacc + "WHERE id = " + id);
 	}
 	private void updatePerson(int id, String name, int age, char gender, String phone, String address) throws SQLException {
 		statement.executeUpdate("UPDATE person set name= " + name + ", age = " + age + ", gender = " + gender + ", phone = " + phone + ", address = " + address + "WHERE id = " + id);
@@ -78,8 +93,12 @@ public class ReasonableCare {
 		statement.executeUpdate("UPDATE doctor set professional_title = " + profTitle + "WHERE id= " + id);
 	}
 	
+	private void updateInsuranceInfo(int studentID, String insName, String policyNum, String start, String end, float copayment) throws SQLException {
+		statement.executeUpdate("UPDATE health_insurance set ins_name = " + insName + ", policy_num = " + policyNum + ", start_date = " + start + ", end_date =" + end + ", copayment = " + copayment + " WHERE s_id = " + studentID);
+	}
+	
 	private void updateAppointment(int id, int studentID, int staffID, String reason, String date, String start, String end, float amt, String notes) throws SQLException {
-		statement.executeUpdate("UPDATE appointment set reason = " + reason + ", appt_date = " + date + ", start_time = " + start + ", end_time = " + end + ", amt = " + amt + ", notes = " + notes + "WHERE id = " + id );
+		statement.executeUpdate("UPDATE appointment set reason = " + reason + ", appt_date =  to_date(" + date + ", 'DD-MON-YYYY'), start_time =  to_date(" + start + ", 'HH:MIPM'), end_time =  to_date(" + end + ", 'HH:MIPM'), amt = " + amt + ", notes = " + notes + "WHERE id = " + id );
 	}
 	
 	private void viewAppointmentInfo() {

@@ -17,23 +17,22 @@ public class ReasonableCare {
 	public static void main(String[] args) {
 		initialize();
 
-		// try
-		// {
-		// //result =
-		// statement.executeQuery("SELECT * FROM STUDENT WHERE id = 1");
-		// //while(result.next()) {
-		// // System.out.println(result.getInt("id"));
-		// //}
-		// //result = statement.executeQuery("SELECT * FROM user_tables;");
-		//
-		// }
-		// catch (SQLException e)
-		// {
-		// e.printStackTrace();
-		// }
 		close();
 	}
 
+	private void createPerson(int id, String name, int age, char gender, String phone, String address) {
+		try {
+			statement.executeUpdate("INSERT INTO person(id, name, age, gender, phone_num, address) VALUES (" + id + ", " + name + ", " + age + ", " + gender + ", " + phone + ", " + address +")");
+		} catch (SQLException e) {}
+
+	}
+	private void createStudentAccount(int id, String name, int age, char gender, String phone, String address, String dateOfBirth, String ssn, int vacc) {
+		try {
+			createPerson(id, name, age, gender, phone, address);
+			statement.executeUpdate("INSERT INTO student(id, date_of_birth, ssn, vacc) VALUES (" + id + ", to_date(" + dateOfBirth + ", 'DD-MON-YYYY'), " +ssn + "," + vacc + ")");
+		} catch (SQLException e) {}
+	}
+	
 	private static void initialize() {
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
@@ -43,44 +42,28 @@ public class ReasonableCare {
 			try {
 				/* DROP TABLES */
 				statement.executeUpdate("DROP TABLE medical_record ");
-			} catch (SQLException e) {
-				// printSQLException(e);
-			}
+			} catch (SQLException e) {}
 			try {
 				statement.executeUpdate("DROP TABLE doctor_schedule ");
-			} catch (SQLException e) {
-				// printSQLException(e);
-			}
+			} catch (SQLException e) {}
 			try {
 				statement.executeUpdate("DROP TABLE billing_info ");
-			} catch (SQLException e) {
-				// printSQLException(e);
-			}
+			} catch (SQLException e) {}
 			try {
 				statement.executeUpdate("DROP TABLE health_insurance ");
-			} catch (SQLException e) {
-				// printSQLException(e);
-			}
+			} catch (SQLException e) {}
 			try {
 				statement.executeUpdate("DROP TABLE appointment ");
-			} catch (SQLException e) {
-				// printSQLException(e);
-			}
+			} catch (SQLException e) {}
 			try {
 				statement.executeUpdate("DROP TABLE doctor ");
-			} catch (SQLException e) {
-				// printSQLException(e);
-			}
+			} catch (SQLException e) {}
 			try {
 				statement.executeUpdate("DROP TABLE staff ");
-			} catch (SQLException e) {
-				// printSQLException(e);
-			}
+			} catch (SQLException e) {}
 			try {
 				statement.executeUpdate("DROP TABLE student ");
-			} catch (SQLException e) {
-				// printSQLException(e);
-			}
+			} catch (SQLException e) {}
 			try {
 				statement.executeUpdate("DROP TABLE person ");
 			} catch (SQLException e) {}
@@ -88,21 +71,20 @@ public class ReasonableCare {
 				statement.executeUpdate("DROP SEQUENCE appointment_seq");
 			} catch (SQLException e) {}
 
-			System.out.println("Dropping Complete");
+			//System.out.println("Dropping Complete");
+			
 			/* CREATE SEQUENCES */
-			// statement.executeUpdate("CREATE SEQUENCE person_seq START WITH 0 MINVALUE 0 INCREMENT BY 1");
 			statement.executeUpdate("CREATE SEQUENCE appointment_seq START WITH 16 MINVALUE 0 INCREMENT BY 1");
 
 			statement.executeUpdate("CREATE TABLE person(id INT PRIMARY KEY, name VARCHAR(100) NOT NULL, age INT NOT NULL, gender VARCHAR(1) NOT NULL, phone_num VARCHAR(20) NOT NULL, address VARCHAR(100) NOT NULL)");
 			statement.executeUpdate("CREATE TABLE staff(id INT PRIMARY KEY, job_title VARCHAR(1) NOT NULL, department VARCHAR(30), FOREIGN KEY (id) REFERENCES person(id) ON DELETE CASCADE)");
 			statement.executeUpdate("CREATE TABLE doctor(id INT PRIMARY KEY, professional_title VARCHAR(30) NOT NULL, FOREIGN KEY (id) REFERENCES person(id) ON DELETE CASCADE)");
 			statement.executeUpdate("CREATE TABLE student(id INT PRIMARY KEY, date_of_birth DATE NOT NULL, ssn VARCHAR(11), vacc INT NOT NULL, FOREIGN KEY (id) REFERENCES person(id) ON DELETE CASCADE)");
-			statement.executeUpdate("CREATE TABLE appointment(id INT PRIMARY KEY, s_id INT, staff_id INT, reason VARCHAR(30) NOT NULL, appt_date DATE NOT NULL, start_time DATE NOT NULL, end_time DATE NOT NULL, amt_billed FLOAT NOT NULL, notes VARCHAR(1000), FOREIGN KEY (s_id) REFERENCES student(id), FOREIGN KEY (staff_id) REFERENCES staff(id))");
+			statement.executeUpdate("CREATE TABLE appointment(id INT PRIMARY KEY, s_id INT, staff_id INT, reason VARCHAR(30) NOT NULL, appt_date DATE NOT NULL, start_time DATE NOT NULL, end_time DATE NOT NULL, amt_billed FLOAT NOT NULL, notes VARCHAR(100), FOREIGN KEY (s_id) REFERENCES student(id), FOREIGN KEY (staff_id) REFERENCES staff(id))");
 			statement.executeUpdate("CREATE TABLE medical_record(appt_id INT PRIMARY KEY, s_id INT, d_id INT, start_date DATE NOT NULL, end_date DATE, prescription VARCHAR(30) NOT NULL, diagnosis VARCHAR(30) NOT NULL, FOREIGN KEY (appt_id) REFERENCES appointment(id) ON DELETE CASCADE, FOREIGN KEY (s_id) REFERENCES student(id) ON DELETE CASCADE, FOREIGN KEY (d_id) REFERENCES doctor(id) ON DELETE CASCADE)");
 			statement.executeUpdate("CREATE TABLE billing_info(s_id INT PRIMARY KEY, appt_id INT, billing_addr VARCHAR(100) NOT NULL, card_type VARCHAR(1) NOT NULL, card_num VARCHAR(19) NOT NULL, card_company VARCHAR(30) NOT NULL, FOREIGN KEY(s_id) REFERENCES student(id), FOREIGN KEY (appt_id) REFERENCES appointment(id))");
 			statement.executeUpdate("CREATE TABLE health_insurance(s_id INT PRIMARY KEY, ins_name VARCHAR(30) NOT NULL, policy_num VARCHAR(30) NOT NULL, start_date DATE NOT NULL, end_date DATE NOT NULL, copayment FLOAT NOT NULL, FOREIGN KEY (s_id) REFERENCES student(id))");
 			statement.executeUpdate("CREATE TABLE doctor_schedule(d_id INT PRIMARY KEY, days_available VARCHAR(5) NOT NULL, start_time DATE NOT NULL, end_time DATE NOT NULL, FOREIGN KEY (d_id) REFERENCES doctor(id))");
-
 			
 			statement.executeUpdate("INSERT INTO person(id, name, age, gender, phone_num, address) VALUES (10001, 'John Terry', 48, 'M', '919-100-2101', '106 Cloverdale Ct, Raleigh, NC 27607')");
 			statement.executeUpdate("INSERT INTO person(id, name, age, gender, phone_num, address) VALUES (10501, 'Mary Jobs', 30, 'F', '919-500-1212', '106 RiverDale Ct, Raleigh, NC 27807')");
@@ -135,112 +117,14 @@ public class ReasonableCare {
 			statement.executeUpdate("INSERT INTO doctor_schedule(d_id, days_available, start_time, end_time) VALUES (10001, 'MTWF', to_date('3:00PM', 'HH:MIPM'), to_date('6:00PM', 'HH:MIPM'))");
 			statement.executeUpdate("INSERT INTO doctor_schedule(d_id, days_available, start_time, end_time) VALUES (10501, 'TF', to_date('10:00AM', 'HH:MIPM'), to_date('1:00PM', 'HH:MIPM'))");
 
-			// statement.executeUpdate("CREATE SEQUENCE billing_statement_seq START WITH 0 MINVALUE 0 INCREMENT BY 1");
-
-			/* CREATE TABLES */
-			// statement.executeUpdate("CREATE TABLE health_insurance( name VARCHAR(100) PRIMARY KEY, address VARCHAR(100), phone_num VARCHAR(10))");
-			// statement.executeUpdate("CREATE TABLE person(id INT PRIMARY KEY, name VARCHAR(100),phone_num VARCHAR(10))");
-			// statement.executeUpdate("CREATE TABLE login(login_id VARCHAR(30) PRIMARY KEY, login_pwd VARCHAR(30) NOT NULL,person_id INT,FOREIGN KEY (person_id) REFERENCES person(id))");
-			// statement.executeUpdate("CREATE TABLE student( id INT PRIMARY KEY,date_of_birth DATE,ins_acct_id INT,insurance_name VARCHAR(30),FOREIGN KEY (id) REFERENCES person(id) ON DELETE CASCADE, FOREIGN KEY (insurance_name) REFERENCES health_insurance(name))");
-			// statement.executeUpdate("CREATE TABLE staff( id INT PRIMARY KEY,FOREIGN KEY (id) REFERENCES person(id) ON DELETE CASCADE)");
-			// statement.executeUpdate("CREATE TABLE medical_staff( id INT PRIMARY KEY,FOREIGN KEY (id) REFERENCES person(id) ON DELETE CASCADE)");
-			// statement.executeUpdate("CREATE TABLE nurse(id INT PRIMARY KEY, FOREIGN KEY (id) REFERENCES person(id) ON DELETE CASCADE)");
-			// statement.executeUpdate("CREATE TABLE doctor(id INT PRIMARY KEY, specialization VARCHAR(30), FOREIGN KEY (id) REFERENCES person(id) ON DELETE CASCADE)");
-			// statement.executeUpdate("CREATE TABLE appointment( id INT PRIMARY KEY,type CHAR(1), app_date DATE,reason VARCHAR(30), notes VARCHAR(1000), student_id INT, med_staff_id INT, FOREIGN KEY (student_id) REFERENCES student(id),FOREIGN KEY (med_staff_id) REFERENCES medical_staff(id))");
-			// statement.executeUpdate("CREATE TABLE billing_statement(id INT PRIMARY KEY,amt_owed FLOAT NOT NULL, amt_covered FLOAT NOT NULL, appointment_id INT,FOREIGN KEY (appointment_id) REFERENCES appointment(id) ON DELETE CASCADE)");
-
-			// /* SEED DB WITH DATA */
-			// statement.executeUpdate("INSERT INTO person(id, name, phone_num) VALUES (person_seq.nextval, 'Bob Higgins', '1111111111')");
-			// statement.executeUpdate("INSERT INTO person(id, name, phone_num) VALUES (person_seq.nextval, 'George Thompson', '1234567890')");
-			// statement.executeUpdate("INSERT INTO person(id, name, phone_num) VALUES (person_seq.nextval, 'Dan Walker', '3265497310')");
-			// statement.executeUpdate("INSERT INTO person(id, name, phone_num) VALUES (person_seq.nextval, 'Sophie Bell', '5861237940')");
-			// statement.executeUpdate("INSERT INTO person(id, name, phone_num) VALUES (person_seq.nextval, 'Elizabeth Edmunds', '9134876520')");
-			// statement.executeUpdate("INSERT INTO person(id, name, phone_num) VALUES (person_seq.nextval, 'Virginia Wright', '4567891230')");
-			// statement.executeUpdate("INSERT INTO person(id, name, phone_num) VALUES (person_seq.nextval, 'Jason Hudson', '4987561230')");
-			// statement.executeUpdate("INSERT INTO person(id, name, phone_num) VALUES (person_seq.nextval, 'Joe MacLeod', '1049587412')");
-			// statement.executeUpdate("INSERT INTO person(id, name, phone_num) VALUES (person_seq.nextval, 'Megan Wallace', '4978561251')");
-			// statement.executeUpdate("INSERT INTO person(id, name, phone_num) VALUES (person_seq.nextval, 'Bella Young', '4913658756')");
-			// statement.executeUpdate("INSERT INTO person(id, name, phone_num) VALUES (person_seq.nextval, 'Diane Baker', '9876543210')");
-			// statement.executeUpdate("INSERT INTO person(id, name, phone_num) VALUES (person_seq.nextval, 'Joseph Nolan', '6489751238')");
-			// statement.executeUpdate("INSERT INTO person(id, name, phone_num) VALUES (person_seq.nextval, 'Olivia Pullman', '1645528954')");
-			// statement.executeUpdate("INSERT INTO person(id, name, phone_num) VALUES (person_seq.nextval, 'Karen Walker', '8451239753')");
-			// statement.executeUpdate("INSERT INTO person(id, name, phone_num) VALUES (person_seq.nextval, 'Zoe Hill', '9163485205')");
-			// statement.executeUpdate("INSERT INTO person(id, name, phone_num) VALUES (person_seq.nextval, 'Alexandra May', '7361594583')");
-			//
-			// statement.executeUpdate("INSERT INTO login(login_id, person_id, login_pwd) VALUES ('user1', 16,'password')");
-			// statement.executeUpdate("INSERT INTO login(login_id, person_id, login_pwd) VALUES ('user2', 1,'password')");
-			// statement.executeUpdate("INSERT INTO login(login_id, person_id, login_pwd) VALUES ('user3', 2,'password')");
-			// statement.executeUpdate("INSERT INTO login(login_id, person_id, login_pwd) VALUES ('user4', 3,'password')");
-			// statement.executeUpdate("INSERT INTO login(login_id, person_id, login_pwd) VALUES ('user5', 4,'password')");
-			// statement.executeUpdate("INSERT INTO login(login_id, person_id, login_pwd) VALUES ('user6', 5,'password')");
-			// statement.executeUpdate("INSERT INTO login(login_id, person_id, login_pwd) VALUES ('user7', 6,'password')");
-			// statement.executeUpdate("INSERT INTO login(login_id, person_id, login_pwd) VALUES ('user8', 7,'password')");
-			// statement.executeUpdate("INSERT INTO login(login_id, person_id, login_pwd) VALUES ('user9', 8,'password')");
-			// statement.executeUpdate("INSERT INTO login(login_id, person_id, login_pwd) VALUES ('user10', 9,'password')");
-			// statement.executeUpdate("INSERT INTO login(login_id, person_id, login_pwd) VALUES ('user11', 10,'password')");
-			// statement.executeUpdate("INSERT INTO login(login_id, person_id, login_pwd) VALUES ('user12', 11,'password')");
-			// statement.executeUpdate("INSERT INTO login(login_id, person_id, login_pwd) VALUES ('user13', 12,'password')");
-			// statement.executeUpdate("INSERT INTO login(login_id, person_id, login_pwd) VALUES ('user14', 13,'password')");
-			// statement.executeUpdate("INSERT INTO login(login_id, person_id, login_pwd) VALUES ('user15', 14,'password')");
-			// statement.executeUpdate("INSERT INTO login(login_id, person_id, login_pwd) VALUES ('user16', 15,'password')");
-			//
-			// statement.executeUpdate("INSERT INTO health_insurance(name, address, phone_num) VALUES ('ACME', '121 Baker St', '8955556217')");
-			// statement.executeUpdate("INSERT INTO health_insurance(name, address, phone_num) VALUES ('BCBS', '115 Cedar Ln', '6665559345')");
-			// statement.executeUpdate("INSERT INTO health_insurance(name, address, phone_num) VALUES ('Primary Care', '105 Highland Ave', '2225557785')");
-			// statement.executeUpdate("INSERT INTO health_insurance(name, address, phone_num) VALUES ('Alliance', '227 First St', '3695556217')");
-			//
-			// statement.executeUpdate("INSERT INTO student(id, date_of_birth, ins_acct_id, insurance_name) VALUES (16, to_date('5-MAR-1995:12:00:00PM', 'DD-MON-YYYY:HH:MI:SSPM'), 12345, 'ACME')");
-			// statement.executeUpdate("INSERT INTO student(id, date_of_birth, ins_acct_id, insurance_name) VALUES (1, to_date('18-JAN-1993:12:00:00PM', 'DD-MON-YYYY:HH:MI:SSPM'), 54321, 'Primary Care')");
-			// statement.executeUpdate("INSERT INTO student(id, date_of_birth, ins_acct_id, insurance_name) VALUES (2, to_date('28-FEB-1993:12:00:00PM', 'DD-MON-YYYY:HH:MI:SSPM'), 98765, 'Alliance')");
-			// statement.executeUpdate("INSERT INTO student(id, date_of_birth, ins_acct_id, insurance_name) VALUES (3, to_date('15-MAR-1994:12:00:00PM', 'DD-MON-YYYY:HH:MI:SSPM'), 56789, 'BCBS')");
-			//
-			// statement.executeUpdate("INSERT INTO staff(id) VALUES (4)");
-			// statement.executeUpdate("INSERT INTO staff(id) VALUES (5)");
-			// statement.executeUpdate("INSERT INTO staff(id) VALUES (6)");
-			// statement.executeUpdate("INSERT INTO staff(id) VALUES (7)");
-			// statement.executeUpdate("INSERT INTO staff(id) VALUES (8)");
-			// statement.executeUpdate("INSERT INTO staff(id) VALUES (9)");
-			// statement.executeUpdate("INSERT INTO staff(id) VALUES (10)");
-			// statement.executeUpdate("INSERT INTO staff(id) VALUES (11)");
-			// statement.executeUpdate("INSERT INTO staff(id) VALUES (12)");
-			// statement.executeUpdate("INSERT INTO staff(id) VALUES (13)");
-			// statement.executeUpdate("INSERT INTO staff(id) VALUES (14)");
-			// statement.executeUpdate("INSERT INTO staff(id) VALUES (15)");
-			//
-			// statement.executeUpdate("INSERT INTO medical_staff(id) VALUES (8)");
-			// statement.executeUpdate("INSERT INTO medical_staff(id) VALUES (9)");
-			// statement.executeUpdate("INSERT INTO medical_staff(id) VALUES (10)");
-			// statement.executeUpdate("INSERT INTO medical_staff(id) VALUES (11)");
-			// statement.executeUpdate("INSERT INTO medical_staff(id) VALUES (12)");
-			// statement.executeUpdate("INSERT INTO medical_staff(id) VALUES (13)");
-			// statement.executeUpdate("INSERT INTO medical_staff(id) VALUES (14)");
-			// statement.executeUpdate("INSERT INTO medical_staff(id) VALUES (15)");
-			//
-			// statement.executeUpdate("INSERT INTO nurse(id) VALUES (8)");
-			// statement.executeUpdate("INSERT INTO nurse(id) VALUES (9)");
-			// statement.executeUpdate("INSERT INTO nurse(id) VALUES (10)");
-			// statement.executeUpdate("INSERT INTO nurse(id) VALUES (11)");
-			//
-			// statement.executeUpdate("INSERT INTO doctor(id, specialization) VALUES (12, 'pediatrics')");
-			// statement.executeUpdate("INSERT INTO doctor(id, specialization) VALUES (13, 'physician')");
-			// statement.executeUpdate("INSERT INTO doctor(id, specialization) VALUES (14, 'orthopedics')");
-			// statement.executeUpdate("INSERT INTO doctor(id, specialization) VALUES (15, 'pulmonology')");
-			//
-			// statement.executeUpdate("INSERT INTO appointment(id, type, app_date, reason, notes, student_id, med_staff_id) VALUES (appointment_seq.nextval, 'P', to_date('13-MAR-2014:12:00:00PM', 'DD-MON-YYYY:HH:MI:SSPM'), 'checkup','passed', 16, 15)");
-			// statement.executeUpdate("INSERT INTO appointment(id, type, app_date, reason, notes, student_id, med_staff_id) VALUES (appointment_seq.nextval, 'C', to_date('13-MAR-2014:01:00:00PM', 'DD-MON-YYYY:HH:MI:SSPM'), 'sickness','prescribing medication', 2, 15)");
-			// statement.executeUpdate("INSERT INTO appointment(id, type, app_date, reason, notes, student_id, med_staff_id) VALUES (appointment_seq.nextval, 'V', to_date('13-MAR-2014:12:00:00PM', 'DD-MON-YYYY:HH:MI:SSPM'), 'measles', '', 3, 13)");
-			// statement.executeUpdate("INSERT INTO appointment(id, type, app_date, reason, notes, student_id, med_staff_id) VALUES (appointment_seq.nextval, 'P', to_date('15-MAR-2014:12:00:00PM', 'DD-MON-YYYY:HH:MI:SSPM'), 'checkup', 'passed', 2, 14)");
-			//
-			// statement.executeUpdate("INSERT INTO billing_statement(id, amt_owed, amt_covered, appointment_id) VALUES (billing_statement_seq.nextval, 20.00, 20.00, 4)");
-			// statement.executeUpdate("INSERT INTO billing_statement(id, amt_owed, amt_covered, appointment_id) VALUES (billing_statement_seq.nextval, 30.00, 20.00, 1)");
-			// statement.executeUpdate("INSERT INTO billing_statement(id, amt_owed, amt_covered, appointment_id) VALUES (billing_statement_seq.nextval, 50.00, 86.00, 2)");
-			// statement.executeUpdate("INSERT INTO billing_statement(id, amt_owed, amt_covered, appointment_id) VALUES (billing_statement_seq.nextval, 30.00, 10.00, 3)");
+			
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
+	
 
 	public static boolean ignoreSQLException(String sqlState) {
 

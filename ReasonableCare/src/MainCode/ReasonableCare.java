@@ -37,21 +37,21 @@ public class ReasonableCare {
 	// ** Manage User Accounts **
 	
 	// create a person in the db
-	public void createPerson(int id, String name, int age, char gender, String phone, String address) {
+	public static void createPerson(int id, String name, int age, char gender, String phone, String address) {
 		try {
 			statement.executeUpdate("INSERT INTO person(id, name, age, gender, phone_num, address) VALUES (" + id + ", " + name + ", " + age + ", " + gender + ", " + phone + ", " + address +")");
 		} catch (SQLException e) {}
 	}
 	
 	// create a staff member in the db
-	public void createStaff(int id, char jobTitle, String department) {
+	public static void createStaff(int id, char jobTitle, String department) {
 		try {
 			statement.executeUpdate("INSERT INTO staff(id, job_title, department) VALUES (" + 10001 + ", " + jobTitle + "," + department + ")");
 		} catch (SQLException e) {}
 	}
 	
 	// create a doctor in the db
-	public void createDoctor(int id, String name, int age, char gender, char jobTitle, String profTitle, String department, String phone, String address) {
+	public static void createDoctor(int id, String name, int age, char gender, char jobTitle, String profTitle, String department, String phone, String address) {
 		createPerson(id, name, age, gender, phone, address);
 		createStaff(id, jobTitle, department);
 		try {
@@ -60,7 +60,7 @@ public class ReasonableCare {
 	}
 	
 	// create a student
-	public void createStudent(int id, String name, int age, char gender, String phone, String address, String dateOfBirth, String ssn, int vacc) {
+	public static void createStudent(int id, String name, int age, char gender, String phone, String address, String dateOfBirth, String ssn, int vacc) {
 		createPerson(id, name, age, gender, phone, address);
 		try {
 			statement.executeUpdate("INSERT INTO student(id, date_of_birth, ssn, vacc) VALUES (" + id + ", to_date(" + dateOfBirth + ", 'DD-MON-YYYY'), " +ssn + "," + vacc + ")");
@@ -78,7 +78,7 @@ public class ReasonableCare {
 		} catch (SQLException e) {}
 	}
 	
-	public void updateStudent(int id, String name, int age, char gender, String phone, String address, String dateOfBirth, String ssn, int vacc) throws SQLException {
+	public static void updateStudent(int id, String name, int age, char gender, String phone, String address, String dateOfBirth, String ssn, int vacc) throws SQLException {
 		updatePerson(id, name, age, gender, phone, address);
 		statement.executeUpdate("UPDATE student set date_of_birth =  to_date(" + dateOfBirth + ", 'DD-MON-YYYY'), ssn = " + ssn + ", vacc = " + vacc + "WHERE id = " + id);
 	}
@@ -273,6 +273,17 @@ public class ReasonableCare {
 	public void viewDoctorAppointments(int doctor_id){
 		try{
 			String query = "SELECT * FROM appointment WHERE doctor_id=" + doctor_id + ";";
+			result = statement.executeQuery(query);
+			while(result.next()){
+				System.out.println();
+			}
+		} catch(SQLException e) {}
+	}
+	
+	public static void viewDoctorAppointmentsByDate(int doctor_id, String apptDate){
+		try{
+			String query = "SELECT * FROM appointment WHERE doctor_id=" + doctor_id 
+					+ "AND appt_date=to_date('" + apptDate + "', 'DD-MON-YYYY');";
 			result = statement.executeQuery(query);
 			while(result.next()){
 				System.out.println();

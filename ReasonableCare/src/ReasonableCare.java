@@ -35,21 +35,21 @@ public class ReasonableCare {
 	// ** Manage User Accounts **
 	
 	// create a person in the db
-	private void createPerson(int id, String name, int age, char gender, String phone, String address) {
+	public void createPerson(int id, String name, int age, char gender, String phone, String address) {
 		try {
 			statement.executeUpdate("INSERT INTO person(id, name, age, gender, phone_num, address) VALUES (" + id + ", " + name + ", " + age + ", " + gender + ", " + phone + ", " + address +")");
 		} catch (SQLException e) {}
 	}
 	
 	// create a staff member in the db
-	private void createStaff(int id, char jobTitle, String department) {
+	public void createStaff(int id, char jobTitle, String department) {
 		try {
 			statement.executeUpdate("INSERT INTO staff(id, job_title, department) VALUES (" + 10001 + ", " + jobTitle + "," + department + ")");
 		} catch (SQLException e) {}
 	}
 	
 	// create a doctor in the db
-	private void createDoctor(int id, String name, int age, char gender, char jobTitle, String profTitle, String department, String phone, String address) {
+	public void createDoctor(int id, String name, int age, char gender, char jobTitle, String profTitle, String department, String phone, String address) {
 		createPerson(id, name, age, gender, phone, address);
 		createStaff(id, jobTitle, department);
 		try {
@@ -58,55 +58,54 @@ public class ReasonableCare {
 	}
 	
 	// create a student
-	private void createStudent(int id, String name, int age, char gender, String phone, String address, String dateOfBirth, String ssn, int vacc) {
+	public void createStudent(int id, String name, int age, char gender, String phone, String address, String dateOfBirth, String ssn, int vacc) {
 		createPerson(id, name, age, gender, phone, address);
 		try {
 			statement.executeUpdate("INSERT INTO student(id, date_of_birth, ssn, vacc) VALUES (" + id + ", to_date(" + dateOfBirth + ", 'DD-MON-YYYY'), " +ssn + "," + vacc + ")");
 		} catch (SQLException e) {}
 	}
-	private void createInsuranceInfo(int studentID, String insName, String policyNum, String start, String end, float copayment) throws SQLException {
+	public void createInsuranceInfo(int studentID, String insName, String policyNum, String start, String end, float copayment) throws SQLException {
 		statement.executeUpdate("INSERT INTO health_insurance(s_id, ins_name, policy_num, start_date, end_date, copayment) VALUES (" + studentID + ", " + insName + ", " + policyNum + ",  to_date(" + start + ", 'DD-MON-YYYY'), to_date(" + end + ", 'DD-MON-YYYY'), " + copayment + ")");
 
 	}
 	
 	// create an appointment
-	private void createAppointment(int id, int studentID, int staffID, String reason, String date, String start, String end, float amt, String notes) {
-		//TODO what about the sequence auto-increment for ID?
+	public static void createAppointment(int studentID, int staffID, String reason, String date, String start, String end, float amt, String notes) {
 		try {
-			statement.executeUpdate("INSERT INTO appointment(id, s_id, staff_id, reason, appt_date, start_time, end_time, amt_billed, notes) VALUES (" + id + ", " + studentID + ", " + staffID + ", " + reason + ",  to_date(" + date + ", 'DD-MON-YYYY'), to_date(" + start + ", 'HH:MIPM'), to_date(" + end + ", 'HH:MIPM')," + amt + ", " + notes + ")");
+			statement.executeUpdate("INSERT INTO appointment(id, s_id, staff_id, reason, appt_date, start_time, end_time, amt_billed, notes) VALUES (appointment_seq.nextVal, " + studentID + ", " + staffID + ", " + reason + ",  to_date(" + date + ", 'DD-MON-YYYY'), to_date(" + start + ", 'HH:MIPM'), to_date(" + end + ", 'HH:MIPM')," + amt + ", " + notes + ")");
 		} catch (SQLException e) {}
 	}
 	
-	private void updateStudent(int id, String name, int age, char gender, String phone, String address, String dateOfBirth, String ssn, int vacc) throws SQLException {
+	public void updateStudent(int id, String name, int age, char gender, String phone, String address, String dateOfBirth, String ssn, int vacc) throws SQLException {
 		updatePerson(id, name, age, gender, phone, address);
 		statement.executeUpdate("UPDATE student set date_of_birth =  to_date(" + dateOfBirth + ", 'DD-MON-YYYY'), ssn = " + ssn + ", vacc = " + vacc + "WHERE id = " + id);
 	}
-	private void updatePerson(int id, String name, int age, char gender, String phone, String address) throws SQLException {
+	public void updatePerson(int id, String name, int age, char gender, String phone, String address) throws SQLException {
 		statement.executeUpdate("UPDATE person set name= " + name + ", age = " + age + ", gender = " + gender + ", phone = " + phone + ", address = " + address + "WHERE id = " + id);
 	}
-	private void updateStaff(int id, String name, int age, char gender, String phone, String address, char jobTitle, String department) throws SQLException {
+	public void updateStaff(int id, String name, int age, char gender, String phone, String address, char jobTitle, String department) throws SQLException {
 		updatePerson(id, name, age, gender, phone, address);
 		statement.executeUpdate("UPDATE staff set jobTitle = " + jobTitle + ", department = " + department + "WHERE id = " + id);
 	}
-	private void updateDoctor(int id, String name, int age, char gender, String phone, String address, char jobTitle, String department, String profTitle) throws SQLException {
+	public void updateDoctor(int id, String name, int age, char gender, String phone, String address, char jobTitle, String department, String profTitle) throws SQLException {
 		updateStaff(id, name, age, gender, phone, address, jobTitle, department);
 		statement.executeUpdate("UPDATE doctor set professional_title = " + profTitle + "WHERE id= " + id);
 	}
 	
-	private void updateInsuranceInfo(int studentID, String insName, String policyNum, String start, String end, float copayment) throws SQLException {
+	public void updateInsuranceInfo(int studentID, String insName, String policyNum, String start, String end, float copayment) throws SQLException {
 		statement.executeUpdate("UPDATE health_insurance set ins_name = " + insName + ", policy_num = " + policyNum + ", start_date = " + start + ", end_date =" + end + ", copayment = " + copayment + " WHERE s_id = " + studentID);
 	}
 	
-	private void updateAppointment(int id, int studentID, int staffID, String reason, String date, String start, String end, float amt, String notes) throws SQLException {
+	public void updateAppointment(int id, int studentID, int staffID, String reason, String date, String start, String end, float amt, String notes) throws SQLException {
 		statement.executeUpdate("UPDATE appointment set reason = " + reason + ", appt_date =  to_date(" + date + ", 'DD-MON-YYYY'), start_time =  to_date(" + start + ", 'HH:MIPM'), end_time =  to_date(" + end + ", 'HH:MIPM'), amt = " + amt + ", notes = " + notes + "WHERE id = " + id );
 	}
 	
-	private void viewAppointmentInfo() {
+	public void viewAppointmentInfo() {
 	
 	}
 	
 	// determine if all vaccinations have been completed by the end of the first semester
-	private void showHolds(int studentID) throws SQLException {
+	public void showHolds(int studentID) throws SQLException {
 		result = statement.executeQuery("SELECT * FROM STUDENT WHERE id = " + studentID);
 		
 		if(result.next()) {
@@ -121,7 +120,7 @@ public class ReasonableCare {
 	
 	//methods for making or cancelling appointments with doctors
 	
-	private void searchForSpecialist(String specialization){
+	public void searchForSpecialist(String specialization){
 		try{
 			String query = "SELECT person.name as name, staff.department as specialization, " +
 					"person.phone_num as phone FROM staff INNER JOIN person ON "+
@@ -133,7 +132,7 @@ public class ReasonableCare {
 		} catch(SQLException e) {}
 	}
 	
-	private void viewStudentAppointments(int student_id){
+	public void viewStudentAppointments(int student_id){
 		try{
 			String query = "SELECT * FROM appointment WHERE student_id=" + student_id + ";";
 			result = statement.executeQuery(query);
@@ -143,7 +142,7 @@ public class ReasonableCare {
 		} catch(SQLException e) {}
 	}
 	
-	private void viewDoctorAppointments(int doctor_id){
+	public void viewDoctorAppointments(int doctor_id){
 		try{
 			String query = "SELECT * FROM appointment WHERE doctor_id=" + doctor_id + ";";
 			result = statement.executeQuery(query);
@@ -153,16 +152,16 @@ public class ReasonableCare {
 		} catch(SQLException e) {}
 	}
 	
-	private void cancelAppointment(int student_id, String date, String start_time, String time_of_day){
+	public void cancelAppointment(int student_id, String date, String start_time){
 		try{
 			String update = "DELETE FROM appointment WHERE student_id=" + student_id +
 					" AND appt_date=to_date('" + date + "', 'DD-MON-YYYY') AND start_time=" +
-					"to_date('" + start_time + time_of_day + "', 'HH:MI" + time_of_day + "')";
+					"to_date('" + start_time + "', 'HH:MIPM')";
 			statement.executeUpdate(update);
 		} catch(SQLException e) {}
 	}
 	
-	private void displayVaccinations(int student_id){
+	public void displayVaccinations(int student_id){
 		try{
 			String query = "SELECT * FROM appointment WHERE reason='Vaccination' AND " +
 					"student_id=" + student_id + ";";
@@ -170,6 +169,51 @@ public class ReasonableCare {
 			while(result.next()){
 				System.out.println();
 			}
+		} catch(SQLException e) {}
+	}
+	
+	public static void displayMedicalRecords(int student_id){
+		try{
+			String query = "SELECT * FROM medical_record RIGHT OUTER JOIN appointment ON " +
+					"medical_record.appt_id=appointment.id WHERE appointment.s_id=student_id";
+			result = statement.executeQuery(query);
+			while(result.next()){
+				System.out.println();
+			}
+		} catch(SQLException e) {}
+	}
+	
+	public static void addNoteToAppointment(int s_id, int d_id, String date, String time, String note){
+		try{
+			String update = "UPDATE appointment SET note=" + note + " WHERE s_id=" + s_id + " AND " +
+					"d_id=" + d_id + " AND appt_date=to_date('" + date + "', 'DD-MON-YYYY') AND " +
+					"start_time=to_date('" + time + "', 'HH:MIPM')";
+			statement.executeUpdate(update);
+		} catch(SQLException e) {}
+	}
+	
+	public static void createMedicalRecord(int s_id, int d_id, String appt_date, String appt_time,
+			String start_date, String end_date, String prescription, String diagnosis){
+		try{
+			String query = "SELECT id FROM appointment WHERE s_id=" + s_id + " AND d_id=" + d_id
+					+ " AND appt_date=to_date('" + appt_date + "', 'DD-MON-YYYY') AND " +
+					"start_time=to_date)'" + appt_time + "', 'HH:MIPM')";
+			result = statement.executeQuery(query);
+			int appt_id = result.getInt("id");
+			String insert = "INSERT INTO medical_record(appt_id, s_id, d_id, start_date, " +
+					"end_date, prescription, diagnosis) VALUES (" + appt_id + ", " + s_id +
+					", " + d_id + ", " + start_date + ", " + end_date + ", " + prescription +
+					", " + diagnosis + ";";
+			statement.executeUpdate(insert);
+		} catch(SQLException e) {}
+	}
+	
+	public static void viewPastDoctorInfo(int s_id){
+		try{
+			String query = "SELECT person.name, staff.department, person.phone_num FROM person" +
+					" INNER JOIN staff ON person.id=staff.id INNER JOIN appointment ON " +
+					"staff.id=appointment.d_id WHERE appointment.s_id=" + s_id + ";";
+			result = statement.executeQuery(query);
 		} catch(SQLException e) {}
 	}
 	

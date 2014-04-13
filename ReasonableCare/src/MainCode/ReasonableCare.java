@@ -19,7 +19,7 @@ public class ReasonableCare {
 	public static void main(String[] args) throws SQLException {
 		initialize();
 		//start();
-		Student.runStudentScenario();
+		Student.runStudentScenario(1102140001);
 		close();
 	}
 	
@@ -94,15 +94,30 @@ public class ReasonableCare {
 		statement.executeUpdate("UPDATE doctor set professional_title = " + profTitle + "WHERE id= " + id);
 	}
 	
-	public void updateInsuranceInfo(int studentID, String insName, String policyNum, String start, String end, float copayment) throws SQLException {
-		statement.executeUpdate("UPDATE health_insurance set ins_name = " + insName + ", policy_num = " + policyNum + ", start_date = " + start + ", end_date =" + end + ", copayment = " + copayment + " WHERE s_id = " + studentID);
+	public static void updateInsuranceInfo(int studentID, String insName, String policyNum) throws SQLException {
+		String start = "13-APR-2014";
+		String end = "15-APR-2016";
+		statement.executeUpdate("UPDATE health_insurance set ins_name = " + insName + ", policy_num = " + policyNum + ", start_date = " + start + ", end_date =" + end + ", copayment = " + 30.0 + " WHERE s_id = " + studentID);
 	}
 	
 	public void updateAppointment(int id, int studentID, int staffID, String reason, String date, String start, String end, float amt, String notes) throws SQLException {
 		statement.executeUpdate("UPDATE appointment set reason = " + reason + ", appt_date =  to_date(" + date + ", 'DD-MON-YYYY'), start_time =  to_date(" + start + ", 'HH:MIPM'), end_time =  to_date(" + end + ", 'HH:MIPM'), amt = " + amt + ", notes = " + notes + "WHERE id = " + id );
 	}
 	
-	private void viewAppointmentInfo(int studentID) {
+	public static void viewPastAppointmentInfo(int studentID) throws SQLException {
+		String query = "SELECT * from appointment WHERE s_id = " + studentID + " AND sysdate > appt_date";
+		result = statement.executeQuery(query);
+		while(result.next()) {
+			
+		}
+	}
+	
+	public static void viewUpcomingAppointmentInfo(int studentID) throws SQLException {
+		String query = "SELECT * from appointment WHERE s_id = " + studentID + " AND sysdate <= appt_date";
+		result = statement.executeQuery(query);
+		while(result.next()) {
+			
+		}
 	}
 	
 	// determine if all vaccinations have been completed by the end of the first semester
@@ -113,6 +128,14 @@ public class ReasonableCare {
 			if(result.getInt("vacc") < 3) {
 				System.out.println("Holds: Vaccinations Are Behind");
 			}
+		}
+	}
+	
+	public static void showInsuranceInfo(int id) throws SQLException {
+		String query = "SELECT * FROM health_insurance WHERE s_id =" + id;
+		result = statement.executeQuery(query);
+		if(result.next()) {
+			
 		}
 	}
 	
@@ -173,6 +196,20 @@ public class ReasonableCare {
 					return false;
 				}
 			}
+		return true;
+	}
+	
+	public static float getCopay(int id) throws SQLException {
+		String query = "SELECT copayment FROM health_insurance WHERE s_id = " + id;
+		result = statement.executeQuery(query);
+		if(result.next()) {
+			return result.getFloat("copayment");
+		}
+		return -1.0f;
+	}
+	
+	// a dummy method for the card company's api to verify the payment
+	public static boolean verifyPayment(String type, String number, String company, String address, String exp) {
 		return true;
 	}
 	
@@ -237,7 +274,7 @@ public class ReasonableCare {
 		} catch(SQLException e) {}
 	}
 	
-	public void cancelAppointment(int student_id, String date, String start_time){
+	public static void cancelAppointment(int student_id, String date, String start_time){
 		try{
 			String update = "DELETE FROM appointment WHERE student_id=" + student_id +
 					" AND appt_date=to_date('" + date + "', 'DD-MON-YYYY') AND start_time=" +

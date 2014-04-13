@@ -1,3 +1,4 @@
+package MainCode;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -15,10 +16,10 @@ public class ReasonableCare {
 	private static Statement statement = null;
 	private static ResultSet result = null;
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws SQLException {
 		initialize();
 		//start();
-		Student.runStudentScenario();
+		Student.runStudentScenario(1102140001);
 		close();
 	}
 	
@@ -99,15 +100,30 @@ public class ReasonableCare {
 		} catch(SQLException e) {}
 	}
 	
-	public void updateInsuranceInfo(int studentID, String insName, String policyNum, String start, String end, float copayment) throws SQLException {
-		statement.executeUpdate("UPDATE health_insurance set ins_name = " + insName + ", policy_num = " + policyNum + ", start_date = " + start + ", end_date =" + end + ", copayment = " + copayment + " WHERE s_id = " + studentID);
+	public static void updateInsuranceInfo(int studentID, String insName, String policyNum) throws SQLException {
+		String start = "13-APR-2014";
+		String end = "15-APR-2016";
+		statement.executeUpdate("UPDATE health_insurance set ins_name = " + insName + ", policy_num = " + policyNum + ", start_date = " + start + ", end_date =" + end + ", copayment = " + 30.0 + " WHERE s_id = " + studentID);
 	}
 	
 	public void updateAppointment(int id, int studentID, int staffID, String reason, String date, String start, String end, float amt, String notes) throws SQLException {
 		statement.executeUpdate("UPDATE appointment set reason = " + reason + ", appt_date =  to_date(" + date + ", 'DD-MON-YYYY'), start_time =  to_date(" + start + ", 'HH:MIPM'), end_time =  to_date(" + end + ", 'HH:MIPM'), amt = " + amt + ", notes = " + notes + "WHERE id = " + id );
 	}
 	
-	private void viewAppointmentInfo(int studentID) {
+	public static void viewPastAppointmentInfo(int studentID) throws SQLException {
+		String query = "SELECT * from appointment WHERE s_id = " + studentID + " AND sysdate > appt_date";
+		result = statement.executeQuery(query);
+		while(result.next()) {
+			
+		}
+	}
+	
+	public static void viewUpcomingAppointmentInfo(int studentID) throws SQLException {
+		String query = "SELECT * from appointment WHERE s_id = " + studentID + " AND sysdate <= appt_date";
+		result = statement.executeQuery(query);
+		while(result.next()) {
+			
+		}
 	}
 	
 	// determine if all vaccinations have been completed by the end of the first semester
@@ -121,8 +137,88 @@ public class ReasonableCare {
 		}
 	}
 	
+	public static void showInsuranceInfo(int id) throws SQLException {
+		String query = "SELECT * FROM health_insurance WHERE s_id =" + id;
+		result = statement.executeQuery(query);
+		if(result.next()) {
+			
+		}
+	}
+	
 	// ** End Manage User Accounts
 	// **********************************************************
+	
+	
+	
+	public static char toDayAbbrev(int value) {
+		switch(value) {
+			case 2: return 'M';
+			case 3: return 'T';
+			case 4: return 'W';
+			case 5: return 'R';
+			case 6: return 'F';
+			default: return 'S';
+		}
+	} 
+	
+	public static char getDayOfWeek(String date) throws SQLException {
+		String query = "SELECT to_char(to_date('"+ date +"', 'DD-MON-YYYY'), 'D') AS Day from dual";
+		result = statement.executeQuery(query);
+		if(result.next()) {
+			int dayNum = result.getInt("Day");
+			char c = toDayAbbrev(dayNum);
+			return c;
+		}
+		return 'S';
+	}
+	
+	public static boolean doctorAvailable(int id, String date) throws SQLException {
+		char day = getDayOfWeek(date);
+		String query = "SELECT * FROM doctor_schedule WHERE d_id=" + id + " AND days_available LIKE '%" + day + "%'";
+		result = statement.executeQuery(query);
+			if(result.next()){
+				return true;
+			}
+		return false;
+	}
+	
+	public static String convertToSQLTime(String time) throws SQLException {
+		String query = "SELECT to_char(to_date(' "+ time +" ', 'HH:MIPM'), 'HH:MIPM') AS time FROM dual";
+		result = statement.executeQuery(query);
+		if(result.next()){
+			time = result.getString("time");
+			return time;
+		}
+		return "";
+	}
+	
+	public static boolean timeAvailable(int id, String date, String startTime) throws SQLException {
+		startTime = convertToSQLTime(startTime);
+		String query = "SELECT to_char(start_time, 'HH:MIPM') AS \"start\", to_char(end_time, 'HH:MIPM') AS \"end\" FROM appointment WHERE staff_id=" + id + " AND appt_date = to_date('" + date + "', 'DD-MON-YYYY')";
+		result = statement.executeQuery(query);
+			if(result.next()){
+				String start = result.getString("start");
+				if(startTime.equals(start)) {
+					return false;
+				}
+			}
+		return true;
+	}
+	
+	public static float getCopay(int id) throws SQLException {
+		String query = "SELECT copayment FROM health_insurance WHERE s_id = " + id;
+		result = statement.executeQuery(query);
+		if(result.next()) {
+			return result.getFloat("copayment");
+		}
+		return -1.0f;
+	}
+	
+	// a dummy method for the card company's api to verify the payment
+	public static boolean verifyPayment(String type, String number, String company, String address, String exp) {
+		return true;
+	}
+	
 	
 	//methods for making or cancelling appointments with doctors
 	
@@ -138,16 +234,18 @@ public class ReasonableCare {
 		} catch(SQLException e) {}
 	}
 	
-	public static void searchForSpecialistByName(String name){
+	// return id of first specialist with name match
+	public static int searchForSpecialistByName(String name){
 		try{
-			String query = "SELECT person.name as name, staff.department as specialization, " +
-					"doctor_schedule.days_available as available FROM ((staff INNER JOIN person ON "+
-					"staff.id=person.id) INNER JOIN doctor_schedule ON doctor_schedule.d_id=staff.id) WHERE name='" + name + "';";
+			String query = "SELECT id FROM person WHERE name='" + name + "'";
 			result = statement.executeQuery(query);
-			while(result.next()){
-				System.out.println();
+			if(result.next()){
+				//System.out.println(result.getInt("id"));
+				
+				return result.getInt("id");
 			}
 		} catch(SQLException e) {}
+		return 0;
 	}
 	
 	public static void searchForSpecialist(String specialization){
@@ -182,7 +280,7 @@ public class ReasonableCare {
 		} catch(SQLException e) {}
 	}
 	
-	public void cancelAppointment(int student_id, String date, String start_time){
+	public static void cancelAppointment(int student_id, String date, String start_time){
 		try{
 			String update = "DELETE FROM appointment WHERE student_id=" + student_id +
 					" AND appt_date=to_date('" + date + "', 'DD-MON-YYYY') AND start_time=" +
@@ -247,7 +345,7 @@ public class ReasonableCare {
 		} catch(SQLException e) {}
 	}
 	
-	private static void initialize() {
+	public static void initialize() {
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			connection = DriverManager.getConnection(jdbcURL, user, password);
@@ -382,7 +480,7 @@ public class ReasonableCare {
 		}
 	}
 
-	private static void close() {
+	public static void close() {
 		if (connection != null) {
 			try {
 				connection.close();

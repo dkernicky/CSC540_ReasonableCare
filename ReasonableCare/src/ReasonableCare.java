@@ -81,16 +81,22 @@ public class ReasonableCare {
 		updatePerson(id, name, age, gender, phone, address);
 		statement.executeUpdate("UPDATE student set date_of_birth =  to_date(" + dateOfBirth + ", 'DD-MON-YYYY'), ssn = " + ssn + ", vacc = " + vacc + "WHERE id = " + id);
 	}
-	public void updatePerson(int id, String name, int age, char gender, String phone, String address) throws SQLException {
-		statement.executeUpdate("UPDATE person set name= " + name + ", age = " + age + ", gender = " + gender + ", phone = " + phone + ", address = " + address + "WHERE id = " + id);
+	public static void updatePerson(int id, String name, int age, char gender, String phone, String address){
+		try{
+			statement.executeUpdate("UPDATE person set name= " + name + ", age = " + age + ", gender = " + gender + ", phone = " + phone + ", address = " + address + "WHERE id = " + id);
+		} catch (SQLException e) {}
 	}
-	public void updateStaff(int id, String name, int age, char gender, String phone, String address, char jobTitle, String department) throws SQLException {
-		updatePerson(id, name, age, gender, phone, address);
-		statement.executeUpdate("UPDATE staff set jobTitle = " + jobTitle + ", department = " + department + "WHERE id = " + id);
+	public static void updateStaff(int id, String name, int age, char gender, String phone, String address, char jobTitle, String department){
+		try{
+			updatePerson(id, name, age, gender, phone, address);
+			statement.executeUpdate("UPDATE staff set jobTitle = " + jobTitle + ", department = " + department + "WHERE id = " + id);
+		} catch(SQLException e) {}
 	}
-	public void updateDoctor(int id, String name, int age, char gender, String phone, String address, char jobTitle, String department, String profTitle) throws SQLException {
-		updateStaff(id, name, age, gender, phone, address, jobTitle, department);
-		statement.executeUpdate("UPDATE doctor set professional_title = " + profTitle + "WHERE id= " + id);
+	public static void updateDoctor(int id, String name, int age, char gender, String phone, String address, char jobTitle, String department, String profTitle){
+		try{
+			updateStaff(id, name, age, gender, phone, address, jobTitle, department);
+			statement.executeUpdate("UPDATE doctor set professional_title = " + profTitle + "WHERE id= " + id);
+		} catch(SQLException e) {}
 	}
 	
 	public void updateInsuranceInfo(int studentID, String insName, String policyNum, String start, String end, float copayment) throws SQLException {

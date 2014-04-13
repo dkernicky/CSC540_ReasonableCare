@@ -109,7 +109,28 @@ public class DoctorNurse {
 		ReasonableCare.viewPastDoctorInfo(s_id);
 	}
 	
+	//int id, String name, int age, char gender, String phone, String address, char jobTitle, String department, String profTitle
 	public void updatePersonalInfo(){
 		//TODO make this do something
+		Scanner input = new Scanner(System.in);
+		System.out.println("Please enter your name:");
+		String name = input.nextLine();
+		System.out.println("Please enter your age:");
+		int age = input.nextInt();
+		System.out.println("Please enter your gender (M for male, F for female):");
+		String genderChar = input.nextLine();
+		char gender = genderChar.charAt(0);
+		System.out.println("Please enter your phone number:");
+		String phone = input.nextLine();
+		System.out.println("Please enter your address:");
+		String address = input.nextLine();
+		System.out.println("Please enter your job title (N for nurse, D for doctor):");
+		String titleChar = input.nextLine();
+		char jobTitle = titleChar.charAt(0);
+		System.out.println("Please enter your department:");
+		String department = input.nextLine();
+		System.out.println("Please enter your professional title:");
+		String profTitle = input.nextLine();
+		ReasonableCare.updateDoctor(id, name, age, gender, phone, address, jobTitle, department, profTitle);
 	}
 }

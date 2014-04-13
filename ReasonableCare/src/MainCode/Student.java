@@ -74,6 +74,9 @@ public class Student {
 		System.out.println("Enter a doctor's name (or 1 to return to the previous menu):");
 		String name = input.nextLine();
 		
+		if (name.equalsIgnoreCase("1"))
+			return;
+		
 		int dID = ReasonableCare.searchForSpecialistByName(name);
 		System.out.println("Enter a date (DD-MON-YYYY):");
 		

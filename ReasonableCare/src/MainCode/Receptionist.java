@@ -1,3 +1,4 @@
+package MainCode;
 import java.util.Scanner;
 
 

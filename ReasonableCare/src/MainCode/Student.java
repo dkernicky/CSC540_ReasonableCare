@@ -1,3 +1,4 @@
+package MainCode;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -8,7 +9,7 @@ import java.util.Scanner;
 public class Student {
 	private static int id;
 	
-	public static void runStudentScenario() {
+	public static void runStudentScenario() throws SQLException {
 		Scanner input = new Scanner(System.in);
 
 		System.out.println("Please select an option:");
@@ -45,6 +46,9 @@ public class Student {
 			break;
 		}
 	}
+	//******************Methods to move over
+	
+	//*************************************
 
 	private static void cancelAppointment() {
 		Scanner input = new Scanner(System.in);
@@ -69,18 +73,32 @@ public class Student {
 		String num = input.nextLine();
 	}
 	
-	private static void runAppointmentScenario() {
+	private static void runAppointmentScenario() throws SQLException {
 		Scanner input = new Scanner(System.in);
 		System.out.println("Enter a doctor's name (or 1 to return to the previous menu):");
 		String name = input.nextLine();
+		
+		int dID = ReasonableCare.searchForSpecialistByName(name);
 		System.out.println("Enter a date (DD-MON-YYYY):");
+		
 		String date = input.nextLine();
+		if(!ReasonableCare.doctorAvailable(dID, date)) {
+			System.out.println("The date you have entered is not available.");
+			//TODO: do something else
+			return;
+		}
 		System.out.println("Enter a time (HH:MMPM):");
-		//TODO if time or date invalid, request a new one
 
+		//TODO fix code to check for existence between times
 		String time = input.nextLine();
+		if(!ReasonableCare.timeAvailable(dID, date, time)) {
+			System.out.println("The time you have entered is not available.");
+			//TODO: do something else
+			return;
+		}
 		//TODO get copay amount
 		System.out.println("Your copay for this appointment is ");
+		
 		System.out.println("Please enter your billing address:");
 		String address = input.nextLine();
 		System.out.println("Please enter your card company (VISA, MasterCard, etc.):");

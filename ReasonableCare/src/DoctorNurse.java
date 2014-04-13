@@ -99,6 +99,7 @@ public class DoctorNurse {
 		String prescription = input.nextLine();
 		System.out.println("Please enter the diagnosis leading to this prescription:");
 		String diagnosis = input.nextLine();
+		ReasonableCare.createMedicalRecord(s_id, id, appt_date, appt_time, s_date, e_date, prescription, diagnosis);
 	}
 	
 	public void viewPastDoctors(){

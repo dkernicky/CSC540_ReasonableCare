@@ -17,7 +17,8 @@ public class ReasonableCare {
 
 	public static void main(String[] args) {
 		initialize();
-		start();
+		//start();
+		Student.runStudentScenario();
 		close();
 	}
 	
@@ -100,8 +101,7 @@ public class ReasonableCare {
 		statement.executeUpdate("UPDATE appointment set reason = " + reason + ", appt_date =  to_date(" + date + ", 'DD-MON-YYYY'), start_time =  to_date(" + start + ", 'HH:MIPM'), end_time =  to_date(" + end + ", 'HH:MIPM'), amt = " + amt + ", notes = " + notes + "WHERE id = " + id );
 	}
 	
-	public void viewAppointmentInfo() {
-	
+	private void viewAppointmentInfo(int studentID) {
 	}
 	
 	// determine if all vaccinations have been completed by the end of the first semester
@@ -121,6 +121,7 @@ public class ReasonableCare {
 	//methods for making or cancelling appointments with doctors
 	
 	public void searchForSpecialist(String specialization){
+
 		try{
 			String query = "SELECT person.name as name, staff.department as specialization, " +
 					"person.phone_num as phone FROM staff INNER JOIN person ON "+

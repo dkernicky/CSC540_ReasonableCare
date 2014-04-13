@@ -74,26 +74,36 @@ public class Student {
 		System.out.println("Enter a doctor's name (or 1 to return to the previous menu):");
 		String name = input.nextLine();
 		
-		if (name.equalsIgnoreCase("1"))
+		if (name.equals("1"))
 			return;
+		int dID = -1;
+		dID = ReasonableCare.searchForSpecialistByName(name);
 		
-		int dID = ReasonableCare.searchForSpecialistByName(name);
-		System.out.println("Enter a date (DD-MON-YYYY):");
-		
-		String date = input.nextLine();
-		if(!ReasonableCare.doctorAvailable(dID, date)) {
-			System.out.println("The date you have entered is not available.");
-			//TODO: do something else
-			return;
+		String date = null;
+		boolean dateIsAvailable = false;
+		while(!dateIsAvailable){
+			System.out.println("Enter a date (DD-MON-YYYY) or 1 to return to previous menu:");
+			date = input.nextLine();
+			if (date.equals("1"))
+				return;
+			dateIsAvailable = ReasonableCare.doctorAvailable(dID, date);
+			if(!dateIsAvailable) {
+				System.out.println("The date you have entered is not available.");
+			}
 		}
-		System.out.println("Enter a time (HH:MMPM):");
-
-		//TODO fix code to check for existence between times
-		String time = input.nextLine();
-		if(!ReasonableCare.timeAvailable(dID, date, time)) {
-			System.out.println("The time you have entered is not available.");
-			//TODO: do something else
-			return;
+		
+		String time = null;
+		boolean timeIsAvailable = false;
+		while (!timeIsAvailable){
+			System.out.println("Enter a time (HH:MMPM) or 1 to return to previous menu:");	
+			//TODO fix code to check for existence between times
+			time = input.nextLine();
+			if (time.equals("1"))
+				return;
+			timeIsAvailable = ReasonableCare.timeAvailable(dID, date, time);
+			if(!timeIsAvailable) {
+				System.out.println("The time you have entered is not available.");
+			}
 		}
 		//TODO get copay amount
 		System.out.println("Your copay for this appointment is $" + ReasonableCare.getCopay(id) + ".");
@@ -118,7 +128,6 @@ public class Student {
 			//ReasonableCare.createAppointment(id, dID, reason, date, time, "N/A", amt, "");
 			System.out.println("Your appointment was successfully saved.");
 		}
-
 	}
 	
 	private static void viewBillingInfo() {

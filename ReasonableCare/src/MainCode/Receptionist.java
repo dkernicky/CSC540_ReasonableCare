@@ -21,7 +21,12 @@ public class Receptionist {
 		
 
 		switch(choice) {
-			case 1:	createStudentAppointment();
+			case 1:	try {
+				createStudentAppointment();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			break;
 			case 2:	createStudentAccount();
 			break;
@@ -44,7 +49,15 @@ public class Receptionist {
 		
 	}
 	
-	public void createStudentAppointment() {
+	public void createStudentAppointment() throws SQLException{
+		Scanner input = new Scanner(System.in);
+		System.out.println("Please enter the student ID:");
+		int studentID = input.nextInt();
+		
+		Student.runAppointmentScenario(studentID);
+	}
+	
+	public void createStudentAppointment_old() {
 		// TODO Auto-generated method stub
 		// createAppointment(int studentID, int staffID, String reason, String date, String start, String end, float amt, String notes)
 		

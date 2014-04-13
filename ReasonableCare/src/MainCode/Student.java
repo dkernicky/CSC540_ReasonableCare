@@ -23,7 +23,7 @@ public class Student {
 		
 		int choice = input.nextInt();
 		switch(choice) {
-			case 1:	runAppointmentScenario();
+			case 1:	runAppointmentScenario(id);
 			break;
 			case 2:	viewUpcomingAppointments();
 			break;
@@ -69,7 +69,7 @@ public class Student {
 		ReasonableCare.updateInsuranceInfo(id, name, num);
 	}
 	
-	private static void runAppointmentScenario() throws SQLException {
+	public static void runAppointmentScenario(int studentID) throws SQLException {
 		Scanner input = new Scanner(System.in);
 		System.out.println("Enter a doctor's name (or 1 to return to the previous menu):");
 		String name = input.nextLine();
@@ -106,7 +106,7 @@ public class Student {
 			}
 		}
 		//TODO get copay amount
-		System.out.println("Your copay for this appointment is $" + ReasonableCare.getCopay(id) + ".");
+		System.out.println("Your copay for this appointment is $" + ReasonableCare.getCopay(studentID) + ".");
 
 		System.out.println("Please enter your billing address:");
 		String address = input.nextLine();

@@ -24,7 +24,7 @@ public class Receptionist {
 		System.out.println("9.  Create a staff account");
 		System.out.println("10.  Update staff information");
 		System.out.println("11.  Log out");
-		int choice = input.nextInt();
+		int choice = input.nextInt(); input.nextLine();
 		
 // ADD INSURANCE INFO FOR STUDENT
 		
@@ -60,7 +60,7 @@ public class Receptionist {
 		Scanner input = new Scanner(System.in);
 		
 		System.out.println("Please enter the student ID:");
-		int studentID = input.nextInt();
+		int studentID = input.nextInt(); input.nextLine();
 		Student.viewHolds(studentID);
 	}
 
@@ -68,7 +68,7 @@ public class Receptionist {
 		Scanner input = new Scanner(System.in);
 		
 		System.out.println("Please enter the student ID:");
-		int studentID = input.nextInt();
+		int studentID = input.nextInt(); input.nextLine();
 		
 		Student.viewBillingInfo(studentID);
 	}
@@ -77,7 +77,7 @@ public class Receptionist {
 		Scanner input = new Scanner(System.in);
 		
 		System.out.println("Please enter the student ID:");
-		int studentID = input.nextInt();
+		int studentID = input.nextInt(); input.nextLine();
 		
 		Student.cancelAppointment(studentID);
 	}
@@ -86,7 +86,7 @@ public class Receptionist {
 		Scanner input = new Scanner(System.in);
 		
 		System.out.println("Please enter the student ID:");
-		int studentID = input.nextInt();
+		int studentID = input.nextInt(); input.nextLine();
 		
 		Student.createInsuranceInformation(studentID);
 	}
@@ -97,7 +97,7 @@ public class Receptionist {
 		Scanner input = new Scanner(System.in);
 		
 		System.out.println("Please enter the student ID:");
-		int studentID = input.nextInt();
+		int studentID = input.nextInt(); input.nextLine();
 		
 		Student.updateInsuranceInformation(studentID);
 	}
@@ -107,7 +107,7 @@ public class Receptionist {
 		Scanner input = new Scanner(System.in);
 		
 		System.out.println("Please enter the staff ID:");
-		int staffID = input.nextInt();
+		int staffID = input.nextInt(); input.nextLine();
 		
 		System.out.println("Please enter the staff name:");
 		String name = input.nextLine();
@@ -116,7 +116,7 @@ public class Receptionist {
 		char gender = input.nextLine().toUpperCase().charAt(0);
 		
 		System.out.println("Please enter the staff age:");
-		int age = input.nextInt();
+		int age = input.nextInt(); input.nextLine();
 		
 		System.out.println("Please enter the staff address:");
 		String address = input.nextLine();
@@ -149,7 +149,7 @@ public class Receptionist {
 		Scanner input = new Scanner(System.in);
 		
 		System.out.println("Please enter the staff ID:");
-		int id = input.nextInt();
+		int id = input.nextInt(); input.nextLine();
 
 		// NO DEFAULT VLAUES, NO DATABASE LOOKUP, REENTER EVERYTHING.
 
@@ -160,7 +160,7 @@ public class Receptionist {
 		char gender = input.nextLine().charAt(0);
 
 		System.out.println("Please enter staff age:");
-		int age = input.nextInt();
+		int age = input.nextInt(); input.nextLine();
 
 		System.out.println("Please enter staff address:");
 		String address = input.nextLine();
@@ -189,7 +189,7 @@ public class Receptionist {
 	public static void createStudentAppointment(){
 		Scanner input = new Scanner(System.in);
 		System.out.println("Please enter the student ID:");
-		int studentID = input.nextInt();
+		int studentID = input.nextInt(); input.nextLine();
 		
 		try {
 			Student.runAppointmentScenario(studentID);
@@ -202,7 +202,7 @@ public class Receptionist {
 		Scanner input = new Scanner(System.in);
 		
 		System.out.println("Please enter the student ID:");
-		int studentID = input.nextInt();
+		int studentID = input.nextInt(); input.nextLine();
 		
 		System.out.println("Please enter the student's name:");
 		String name = input.nextLine();
@@ -214,7 +214,7 @@ public class Receptionist {
 		String dateOfBirth = input.nextLine();
 		
 		System.out.println("Please enter the student's age:");
-		int age = input.nextInt();
+		int age = input.nextInt(); input.nextLine();
 		
 		System.out.println("Please enter the student's SSN:");
 		String ssn = input.nextLine();
@@ -226,7 +226,7 @@ public class Receptionist {
 		String phone = input.nextLine();
 
 		System.out.println("Please enter the number of vaccinations completed:");
-		int vaccNum = input.nextInt();
+		int vaccNum = input.nextInt(); input.nextLine();
 		
 		if(op == Operation.CREATE)
 			ReasonableCare.createStudent(studentID, name, age, gender, phone, address, dateOfBirth, ssn, vaccNum);

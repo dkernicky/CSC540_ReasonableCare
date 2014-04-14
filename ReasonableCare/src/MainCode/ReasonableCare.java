@@ -233,7 +233,7 @@ public class ReasonableCare {
 	public static void updateDoctor(int id, String name, int age, char gender, String phone,
 			String address, char jobTitle, String department, String profTitle){
 		try{
-			int status = updateStaff(id, name, age, gender, phone, address, jobTitle, department);
+			updateStaff(id, name, age, gender, phone, address, jobTitle, department);
 			int rows = statement.executeUpdate("UPDATE doctor SET professional_title=" + profTitle
 					+ "WHERE id=" + id);
 			if(rows == 0){

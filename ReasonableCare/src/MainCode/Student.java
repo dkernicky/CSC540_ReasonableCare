@@ -7,7 +7,8 @@ public class Student {
 	private enum Operation {CREATE, UPDATE};
 	
 	// run the student scenario, providing choices and choosing appropriate responses based on user input
-	public static void runStudentScenario(Scanner input, int s_id) throws SQLException {
+	public static boolean runStudentScenario(Scanner input, int s_id) throws SQLException {
+		boolean loggedIn = true;
 		id = s_id;
 		
 		System.out.println("Please select an option:");
@@ -20,7 +21,7 @@ public class Student {
 		System.out.println("7.  Search for a doctor");
 		System.out.println("8.  View holds");
 		System.out.println("9.  View billing information");
-		//System.out.println("10. Update billing information");
+		System.out.println("10.  Log out");
 		
 		int choice = input.nextInt();
 		input.nextLine();
@@ -41,9 +42,12 @@ public class Student {
 			break;
 			case 8:	ReasonableCare.showHolds(id);
 			break;
-			case 9:	viewBillingInfo(input, id);
+			case 9:	viewBillingInfo(id);
+			break;
+			case 10:loggedIn = false; // this is how we log out
 			break;
 		}
+		return loggedIn;
 	}
 
 	// ask the student to verify a date and start time for a past apppointment in order to cancel it
@@ -184,10 +188,8 @@ public class Student {
 	}
 	
 	// get an appointment date and start time from the user to display their billing statement
-	public static void viewBillingInfo(Scanner input, int studentID) {
-		System.out.println("Please enter an appointment date: ");
+	public static void viewBillingInfo(int studentID) {
 		ReasonableCare.viewBillingInfo(id);
-		System.out.println("(this view is not yet unimplemented)");
 	}
 	
 	// display upcoming appointments for the student

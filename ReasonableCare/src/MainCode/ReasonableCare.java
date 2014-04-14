@@ -228,7 +228,6 @@ public class ReasonableCare {
 				int appt_id = result.getInt("id");
 				String insert = "INSERT INTO billing_info(s_id, appt_id, billing_addr, card_type, card_num, card_company) VALUES ( " +
 						s_id + ", " + appt_id + ", '" + addr + "', '" + type + "', '" + num + "', '" + company + "')";
-				
 				int rows = statement.executeUpdate(insert);
 				if(rows == 0){
 					System.out.println("There was an issue entering the given information.");
@@ -493,11 +492,7 @@ public class ReasonableCare {
 		}
 	}
 	
-	// ** End Manage User Accounts
-	// **********************************************************
-	
-	
-	
+	// take a number value (as returned by the SQL 'D' to_date format) and assign it a day-of-the-week char value
 	public static char toDayAbbrev(int value) {
 		switch(value) {
 			case 2: return 'M';
@@ -509,6 +504,7 @@ public class ReasonableCare {
 		}
 	} 
 	
+	// given a date, retrieve the day-of-week number value through SQL
 	public static char getDayOfWeek(String date) throws SQLException {
 		String query = "SELECT to_char(to_date('"+ date +"', 'DD-MON-YYYY'), 'D') AS Day from dual";
 		result = statement.executeQuery(query);
@@ -520,6 +516,7 @@ public class ReasonableCare {
 		return 'S';
 	}
 	
+	// check a doctor's schedule to see if the requested day-of-week char is in the doctor's schedule
 	public static boolean doctorAvailable(int id, String date) throws SQLException {
 		try{
 			char day = getDayOfWeek(date);
@@ -534,6 +531,7 @@ public class ReasonableCare {
 		return false;
 	}
 	
+	// convert a time string into the appropriate SQL format for comparison
 	public static String convertToSQLTime(String time) throws SQLException {
 		String query = "SELECT to_char(to_date(' "+ time +" ', 'HH:MIPM'), 'HH:MIPM') AS time FROM dual";
 		result = statement.executeQuery(query);
@@ -544,13 +542,19 @@ public class ReasonableCare {
 		return "";
 	}
 	
+	// check if a given time is between two other times
 	public static boolean betweenTime(String time, String start, String end) {
 		String query = "SELECT to_date('"+ time +"', 'HH:MIPM') - to_date('"+ start +"', 'HH:MIPM') AS one, to_date('"+ time +"', 'HH:MIPM') - to_date('"+ end +"', 'HH:MIPM') AS two FROM dual";
 		try {
 		result = statement.executeQuery(query);
 			if(result.next()) {
+				// retrieve the difference between the queried time and the start time
 				float result1 = result.getFloat("one");
+				
+				// retrieve the difference between the queried time and the end time
 				float result2 = result.getFloat("two");
+				
+				// a negative result indicated that the time lies between the two others
 				float result = result1*result2;
 				return (result < 0);
 			}
@@ -560,6 +564,8 @@ public class ReasonableCare {
 		return false;
 	}
 	
+	// check whether a doctor a) is available at a given time based on his/her schedule and
+	//   b) has a time conflict with any other appointments for a given time
 	public static boolean timeAvailable(int id, String date, String startTime) throws SQLException {
 		startTime = convertToSQLTime(startTime);
 		String query = "SELECT to_char(start_time, 'HH:MIPM') AS \"start\", to_char(end_time, 'HH:MIPM') AS \"end\" FROM appointment WHERE staff_id=" + id + " AND appt_date = to_date('" + date + "', 'DD-MON-YYYY')";
@@ -574,6 +580,7 @@ public class ReasonableCare {
 		return true;
 	}
 	
+	// retrieve copay information from a student's health insurance info
 	public static float getCopay(int id) throws SQLException {
 		String query = "SELECT copayment FROM health_insurance WHERE s_id = " + id;
 		result = statement.executeQuery(query);
@@ -589,7 +596,7 @@ public class ReasonableCare {
 	}
 	
 	
-	//methods for making or cancelling appointments with doctors
+	//methods for making or canceling appointments with doctors
 	
 	//method for finding a specialist a student wants to see
 	public static void searchForSpecialist(String specialization){
@@ -718,8 +725,7 @@ public class ReasonableCare {
 				int rows = statement.executeUpdate(update);
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 	}
 	

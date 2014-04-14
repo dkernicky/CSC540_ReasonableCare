@@ -99,7 +99,7 @@ public class Receptionist {
 		System.out.println("Please enter the student ID:");
 		int studentID = input.nextInt(); input.nextLine();
 		
-		Student.viewBillingInfo(input, studentID);
+		Student.viewBillingInfo(studentID);
 	}
 
 	/**

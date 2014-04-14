@@ -17,12 +17,26 @@ public class ReasonableCare {
 	private static ResultSet result = null;
 
 	public static void main(String[] args) throws SQLException {
+		System.out.println("before initialize");
 		initialize();
+		System.out.println("after initialize");
 		//start();
 		DoctorNurse test = new DoctorNurse();
 		Scanner input = new Scanner(System.in);
 		test.runDoctorNurseScenario(input, 10001);
 		//Student.runStudentScenario(1102140001);
+		
+		char role = 'R'; // this value will be returned from a query on user id
+		switch (role){
+			case 'R':{
+						boolean loggedIn = true;
+						while(loggedIn){
+							System.out.println("calling Receptionist.runReceptionistScenario()");
+							loggedIn = Receptionist.runReceptionistScenario();
+						}
+					}
+			break;
+		}
 		close();
 		input.close();
 	}
@@ -46,7 +60,7 @@ public class ReasonableCare {
 	}
 	
 	// create a person in the db
-	public static void createPerson(int id, String name, int age, char gender, String phone, String address) {
+	public static int createPerson(int id, String name, int age, char gender, String phone, String address) {
 		try {
 			int rows = statement.executeUpdate("INSERT INTO person(id, name, age, gender, "
 					+ "phone_num, address) VALUES (" + id + ", " + name + ", " + age + ", " +
@@ -54,6 +68,38 @@ public class ReasonableCare {
 			if(rows == 0){
 				System.out.println("The person could not be created using the information provided.");
 			}
+			return rows;
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+		return 0;
+	}
+	
+	// create a student
+	public static void createStudent(int id, String name, int age, char gender, String phone, String address, String dateOfBirth, String ssn, int vacc) {
+		try {
+			connection.setAutoCommit(false);
+		
+			int status = createPerson(id, name, age, gender, phone, address);
+
+			int rows = statement.executeUpdate("INSERT INTO student(id, date_of_birth, ssn, vacc)"
+					+ " VALUES (" + id + ", to_date(" + dateOfBirth + ", 'DD-MON-YYYY'), " +ssn +
+					"," + vacc + ")");
+			if(rows == 1 && status == 1) {
+				connection.commit();
+				System.out.println("The student entry has been created in the database.");
+
+			}
+			else {
+				System.out.println("The student could not be created using the information provided.");
+				connection.rollback();
+			}
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+		
+		try {
+			connection.setAutoCommit(true);
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 		}
@@ -93,25 +139,7 @@ public class ReasonableCare {
 		}
 	}
 	
-	// create a student
-	public static void createStudent(int id, String name, int age, char gender, String phone, String address, String dateOfBirth, String ssn, int vacc) {
-		createPerson(id, name, age, gender, phone, address);
-		try {
-			int rows = statement.executeUpdate("INSERT INTO student(id, date_of_birth, ssn, vacc)"
-					+ " VALUES (" + id + ", to_date(" + dateOfBirth + ", 'DD-MON-YYYY'), " +ssn +
-					"," + vacc + ")");
-			if(rows == 0){
-				System.out.println("The student could not be created using the information provided.");
-			}
-			else{
-				System.out.println("The student entry has been created in the database.");
-			}
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-		}
-	}
-	
-	public void createInsuranceInfo(int studentID, String insName, String policyNum, String start, String end, float copayment) throws SQLException {
+	public static void createInsuranceInfo(int studentID, String insName, String policyNum, String start, String end, float copayment){
 		try{
 			int rows = statement.executeUpdate("INSERT INTO health_insurance(s_id, ins_name, "
 					+ "policy_num, start_date, end_date, copayment) VALUES (" + studentID + ", "
@@ -167,33 +195,40 @@ public class ReasonableCare {
 		}
 	}
 	
-	public static void updatePerson(int id, String name, int age, char gender, String phone,
+	public static int updatePerson(int id, String name, int age, char gender, String phone,
 			String address){
 		try{
 			int rows = statement.executeUpdate("UPDATE person SET name = " + name + ", age = " +
 					age + ", gender = " + gender + ", phone = " + phone + ", address = " +
 					address + "WHERE id = " + id);
-			if(rows == 0){
-				System.out.println("Invalid information provided.");
-			}
+			return rows;
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 		}
+		return 0;
 	}
 	
 	public static void updateStaff(int id, String name, int age, char gender, String phone,
 			String address, char jobTitle, String department){
 		try{
-			updatePerson(id, name, age, gender, phone, address);
+			connection.setAutoCommit(false);
+			int status = updatePerson(id, name, age, gender, phone, address);
 			int rows = statement.executeUpdate("UPDATE staff set jobTitle = " + jobTitle + 
 					", department = " + department + "WHERE id = " + id);
-			if(rows == 0){
-				System.out.println("Invalid information provided.");
-			}
-			else{
+			if(rows == 1 && status == 1) {
 				System.out.println("Information updated.");
+				connection.commit();
+			}
+			else {
+				System.out.println("Invalid information provided.");
+				connection.rollback();
 			}
 		} catch(SQLException e) {
+			System.out.println(e.getMessage());
+		}
+		try {
+			connection.setAutoCommit(true);
+		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 		}
 	}
@@ -215,13 +250,18 @@ public class ReasonableCare {
 		}
 	}
 	
-	public static void updateInsuranceInfo(int studentID, String insName, String policyNum){
+	public static void updateInsuranceInfo(int studentID, String insName, String policyNum, String start, String end, float copayment){
 		try{
-			String start = "13-APR-2014";
-			String end = "15-APR-2016";
+			if(start == null || start.isEmpty()) 
+				start = "13-APR-2014";
+			if(end == null || end.isEmpty()) 
+				end = "15-APR-2016";
+			if(copayment == 0)
+				copayment = 30;
+			
 			int rows = statement.executeUpdate("UPDATE health_insurance set ins_name = " + 
 					insName + ", policy_num = " + policyNum + ", start_date = " + start + ", "
-					+ "end_date =" + end + ", copayment = " + 30.0 + " WHERE s_id = " + studentID);
+					+ "end_date =" + end + ", copayment = " + copayment + " WHERE s_id = " + studentID);
 			if(rows == 0){
 				System.out.println("Invalid insurance information provided.");
 			}
@@ -265,7 +305,7 @@ public class ReasonableCare {
 			String appt_date = result.getString("appt_date");
 			String start_time = result.getString("start_time");
 			String end_time = result.getString("end_time");
-			float amt_billed = result.getFloat("amt_owed");
+			float amt_billed = result.getFloat("amt_billed");
 			String notes = result.getString("notes");
 			System.out.println("Staff ID: " + staff_id);
 			System.out.println("Reason for visit: " + reason);
@@ -292,7 +332,7 @@ public class ReasonableCare {
 			String appt_date = result.getString("appt_date");
 			String start_time = result.getString("start_time");
 			String end_time = result.getString("end_time");
-			float amt_billed = result.getFloat("amt_owed");
+			float amt_billed = result.getFloat("amt_billed");
 			String notes = result.getString("notes");
 			System.out.println("Staff ID: " + staff_id);
 			System.out.println("Reason for visit: " + reason);
@@ -375,12 +415,13 @@ public class ReasonableCare {
 	}
 	
 	public static boolean doctorAvailable(int id, String date) throws SQLException {
-		char day = getDayOfWeek(date);
-		String query = "SELECT * FROM doctor_schedule WHERE d_id=" + id + " AND days_available LIKE '%" + day + "%'";
-		result = statement.executeQuery(query);
+		try{
 			if(result.next()){
 				return true;
 			}
+		} catch(SQLException e){
+			System.out.println(e.getMessage());
+		}
 		return false;
 	}
 	
@@ -491,12 +532,24 @@ public class ReasonableCare {
 	
 	public static void searchForSpecialist(String specialization){
 		try{
-			String query = "SELECT person.name as name, staff.id as staff_id, staff.department "
-					+ "as specialization, person.phone_num as phone, doctor_schedule.days_available"
-					+ " as availability, doctor_schedule.start_time as start_time, doctor_schedule.end_time"
-					+ " as end_time FROM staff INNER JOIN person ON staff.id=person.id INNER JOIN "
-					+ "doctor_schedule ON staff.id=doctor_schedule.d_id WHERE specialization='"
-					+ specialization + "'";
+			String query = "";
+			if(specialization.equals("")) {
+				// constructing SQL statement to return all doctors if specialization is not supplied
+				query = "SELECT person.name as name, staff.id as staff_id, staff.department "
+						+ "as specialization, person.phone_num as phone, doctor_schedule.days_available"
+						+ " as availability, doctor_schedule.start_time as start_time, doctor_schedule.end_time"
+						+ " as end_time FROM staff INNER JOIN person ON staff.id=person.id INNER JOIN "
+						+ "doctor_schedule ON staff.id=doctor_schedule.d_id";
+			}
+			else {
+				// constructing SQL statement to return doctors whose departments match spcialization string
+				query = "SELECT person.name as name, staff.id as staff_id, staff.department "
+						+ "as specialization, person.phone_num as phone, doctor_schedule.days_available"
+						+ " as availability, doctor_schedule.start_time as start_time, doctor_schedule.end_time"
+						+ " as end_time FROM staff INNER JOIN person ON staff.id=person.id INNER JOIN "
+						+ "doctor_schedule ON staff.id=doctor_schedule.d_id WHERE department='"
+						+ specialization + "'";
+			}
 			result = statement.executeQuery(query);
 			System.out.println();
 			System.out.println("------------------------------------------------------");

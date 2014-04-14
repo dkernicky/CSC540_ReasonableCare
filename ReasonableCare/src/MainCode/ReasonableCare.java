@@ -17,11 +17,29 @@ public class ReasonableCare {
 	private static ResultSet result = null;
 
 	public static void main(String[] args) throws SQLException {
+		System.out.println("before initialize");
 		initialize();
+		System.out.println("after initialize");
 		//start();
 		//DoctorNurse test = new DoctorNurse();
 		//test.runDoctorNurseScenario(10001);
+<<<<<<< HEAD
 		Student.runStudentScenario(1102140001);
+=======
+		//Student.runStudentScenario(1102140001);
+		
+		char role = 'R'; // this value will be returned from a query on user id
+		switch (role){
+			case 'R':{
+						boolean loggedIn = true;
+						while(loggedIn){
+							System.out.println("calling Receptionist.runReceptionistScenario()");
+							loggedIn = Receptionist.runReceptionistScenario();
+						}
+					}
+			break;
+		}
+>>>>>>> e9363c16133958c773fe8e00f3bd581fabb0b7e7
 		close();
 	}
 	

@@ -4,14 +4,38 @@ import java.sql.SQLException;
 import java.util.Scanner;
 
 
+/**
+ * This class encapsulates operations performed by the receptionist. 
+ * It provides a command line interface for the following operations:
+ * 
+ * 1. Make appointment
+ * 2. Cancel appointment
+ * 3. Create student acct.
+ * 4. Modify student acct.
+ * 5. Create student ins. info
+ * 6. Update student ins. info
+ * 7. View student acct. holds
+ * 8. View student bill
+ * 9. Create staff acct.
+ * 10. Update staff acct.
+ * 11. Log out
+ *
+ */
 public class Receptionist {
 	private static int id;
 	private enum Operation {CREATE, UPDATE};
 	
+	/**
+	 * Command line interface for receptionist.
+	 * 
+	 * @return true if still logged in, false if logged out
+	 * @throws SQLException
+	 * 
+	 */
 	public static boolean runReceptionistScenario() throws SQLException {
 		boolean loggedIn = true;
 		
-		Scanner input = new Scanner(System.in);		
+		// display menu
 		System.out.println("Please select an option:");
 		System.out.println("1.  Make an appointment");
 		System.out.println("2.  Cancel an appointment");
@@ -22,12 +46,14 @@ public class Receptionist {
 		System.out.println("7.  View student holds");
 		System.out.println("8.  View student billing statement");
 		System.out.println("9.  Create a staff account");
-		System.out.println("10.  Update staff information");
+		System.out.println("10.  Update staff information");		
 		System.out.println("11.  Log out");
+		
+		// take user selection
+		Scanner input = new Scanner(System.in);		
 		int choice = input.nextInt(); input.nextLine();
 		
-// ADD INSURANCE INFO FOR STUDENT
-		
+		// handle the user selection
 		switch(choice) {
 			case 1:	createStudentAppointment();
 			break;
@@ -49,13 +75,17 @@ public class Receptionist {
 			break;
 			case 10:updateStaffInformation();
 			break;
-			case 11:loggedIn = false;
+			case 11:loggedIn = false; // this is how we log out
 			break;
 			
 		}
 		return loggedIn;
 	}
 
+	/**
+	 * Displays student holds, if any. Provides a reason,
+	 *  such as insufficient number of vaccinations.
+	 */
 	private static void viewStudentHolds() {
 		Scanner input = new Scanner(System.in);
 		
@@ -64,6 +94,9 @@ public class Receptionist {
 		Student.viewHolds(studentID);
 	}
 
+	/**
+	 * Displays a bill for an student's appointment
+	 */
 	private static void viewStudentBillingStatement() {
 		Scanner input = new Scanner(System.in);
 		
@@ -73,6 +106,9 @@ public class Receptionist {
 		Student.viewBillingInfo(studentID);
 	}
 
+	/**
+	 * Cancels a student's appointment
+	 */
 	private static void cancelStudentAppointment() {
 		Scanner input = new Scanner(System.in);
 		
@@ -82,6 +118,9 @@ public class Receptionist {
 		Student.cancelAppointment(studentID);
 	}
 
+	/**
+	 * Adds insurance info associated with student acct
+	 */
 	private static void createStudentInsuranceInfo() {
 		Scanner input = new Scanner(System.in);
 		
@@ -91,9 +130,10 @@ public class Receptionist {
 		Student.createInsuranceInformation(studentID);
 	}
 	
-	private static void updateStudentInsuranceInfo() {
-		
-		
+	/**
+	 * Updates insurance info associated with student acct
+	 */
+	private static void updateStudentInsuranceInfo() {		
 		Scanner input = new Scanner(System.in);
 		
 		System.out.println("Please enter the student ID:");
@@ -103,6 +143,9 @@ public class Receptionist {
 	}
 
 
+	/**
+	 * Creates an account for Receptionist, Nurse, or Doctor
+	 */
 	public static void createStaffAccount() {
 		Scanner input = new Scanner(System.in);
 		
@@ -128,23 +171,31 @@ public class Receptionist {
 		char jobTitle = input.nextLine().toUpperCase().charAt(0);
 		
 		String department = "";
-		if(jobTitle != 'R') { // doctor or nurse
+		
+		// enter department for doctor or nurse (not receptionist)
+		if(jobTitle != 'R') { 
 			System.out.println("Please enter the department:");
 			department = input.nextLine();
 		}
 		
-		if(jobTitle == 'D'){ // doctor
+		
+		if(jobTitle == 'D'){ 
+			// enter professional title for doctor
 			System.out.println("Please enter professional title:");
 			String profTitle = input.nextLine();
-			//createDoctor(int id, String name, int age, char gender, char jobTitle, String profTitle, String department, String phone, String address)
+			
+			//create doctor
 			ReasonableCare.createDoctor(staffID, name, age, gender, jobTitle, profTitle, department, phone, address);
 		}
-		else { // nurse or receptionist
-			//createStaff(int id, String name, int age, char gender, char jobTitle, String department, String phone, String address)
+		else { 
+			// create nurse or receptionist			
 			ReasonableCare.createStaff(staffID, name, age, gender, jobTitle, department, phone, address);
 		}
 	}
 
+	/**
+	 * Updates account info for Doctors, Nurses, and Receptionists
+	 */
 	public static void updateStaffInformation() {
 		Scanner input = new Scanner(System.in);
 		
@@ -172,11 +223,14 @@ public class Receptionist {
 		char jobTitle = input.nextLine().toUpperCase().charAt(0);
 
 		String department = "";
+		
+		// doctors and nurses need department (not receptionists)
 		if(jobTitle != 'R'){
 			System.out.println("Please enter staff department:");
 			department = input.nextLine();
 		}
 
+		// doctors need professional title
 		if(jobTitle == 'D'){
 			System.out.println("Please enter the new professional title:");
 			String profTitle = input.nextLine();
@@ -184,8 +238,12 @@ public class Receptionist {
 		}
 		else
 			ReasonableCare.updateStaff(id, name, age, gender, phone, address, jobTitle, department);
+		
 	}
 	
+	/**
+	 * Creates a student appointment
+	 */
 	public static void createStudentAppointment(){
 		Scanner input = new Scanner(System.in);
 		System.out.println("Please enter the student ID:");
@@ -195,6 +253,11 @@ public class Receptionist {
 		input.close();
 	}
 
+	/**
+	 * Takes input for creating or updating student acct
+	 * 
+	 * @param op specifies whether this operation is create or update
+	 */
 	public static void createOrUpdateStudentAccount(Operation op){
 		Scanner input = new Scanner(System.in);
 		

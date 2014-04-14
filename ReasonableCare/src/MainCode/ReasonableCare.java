@@ -178,33 +178,40 @@ public class ReasonableCare {
 		}
 	}
 	
-	public static void updatePerson(int id, String name, int age, char gender, String phone,
+	public static int updatePerson(int id, String name, int age, char gender, String phone,
 			String address){
 		try{
 			int rows = statement.executeUpdate("UPDATE person SET name = " + name + ", age = " +
 					age + ", gender = " + gender + ", phone = " + phone + ", address = " +
 					address + "WHERE id = " + id);
-			if(rows == 0){
-				System.out.println("Invalid information provided.");
-			}
+			return rows;
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 		}
+		return 0;
 	}
 	
 	public static void updateStaff(int id, String name, int age, char gender, String phone,
 			String address, char jobTitle, String department){
 		try{
-			updatePerson(id, name, age, gender, phone, address);
+			connection.setAutoCommit(false);
+			int status = updatePerson(id, name, age, gender, phone, address);
 			int rows = statement.executeUpdate("UPDATE staff set jobTitle = " + jobTitle + 
 					", department = " + department + "WHERE id = " + id);
-			if(rows == 0){
-				System.out.println("Invalid information provided.");
-			}
-			else{
+			if(rows == 1 && status == 1) {
 				System.out.println("Information updated.");
+				connection.commit();
+			}
+			else {
+				System.out.println("Invalid information provided.");
+				connection.rollback();
 			}
 		} catch(SQLException e) {
+			System.out.println(e.getMessage());
+		}
+		try {
+			connection.setAutoCommit(true);
+		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 		}
 	}
@@ -212,7 +219,7 @@ public class ReasonableCare {
 	public static void updateDoctor(int id, String name, int age, char gender, String phone,
 			String address, char jobTitle, String department, String profTitle){
 		try{
-			updateStaff(id, name, age, gender, phone, address, jobTitle, department);
+			int status = updateStaff(id, name, age, gender, phone, address, jobTitle, department);
 			int rows = statement.executeUpdate("UPDATE doctor SET professional_title=" + profTitle
 					+ "WHERE id=" + id);
 			if(rows == 0){

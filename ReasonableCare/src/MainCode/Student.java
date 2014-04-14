@@ -94,19 +94,18 @@ public class Student {
 			ReasonableCare.updateInsuranceInfo(studentID, insName, policyNum, start, end, copayment);
 	}
 	
-	public static void runAppointmentScenario(int studentID) throws SQLException {
+	public static void runAppointmentScenario(int studentID) {
 		Scanner input = new Scanner(System.in);
-		/*
-		 * search doctor by name
-		 */
-		System.out.println("Enter a doctor's name (or 1 to return to the previous menu):");
-		String name = input.nextLine();
+
+		System.out.println("Enter a doctor's id (or 1 to return to the previous menu):");
+		int dID = input.nextInt();
+		input.nextLine();
 		
-		if (name.equals("1"))
+		if (dID == 1)
 			return;
-		int dID = -1;
-		dID = ReasonableCare.searchForSpecialistByName(name);
-		
+		//int dID = -1;
+		//dID = ReasonableCare.searchForSpecialistByName(name);
+		//int dID = 10501;
 		/*
 		 * select appointment date and time
 		 */
@@ -117,7 +116,11 @@ public class Student {
 			date = input.nextLine();
 			if (date.equals("1"))
 				return;
-			dateIsAvailable = ReasonableCare.doctorAvailable(dID, date);
+			try {
+				dateIsAvailable = ReasonableCare.doctorAvailable(dID, date);
+			} catch (SQLException e) {
+				System.out.println(e.getMessage());
+			}
 			if(!dateIsAvailable) {
 				System.out.println("The date you have entered is not available.");
 			}
@@ -131,7 +134,11 @@ public class Student {
 			time = input.nextLine();
 			if (time.equals("1"))
 				return;
-			timeIsAvailable = ReasonableCare.timeAvailable(dID, date, time);
+			try {
+				timeIsAvailable = ReasonableCare.timeAvailable(dID, date, time);
+			} catch (SQLException e) {
+				System.out.println(e.getMessage());
+			}
 			if(!timeIsAvailable) {
 				System.out.println("The time you have entered is not available.");
 			}
@@ -141,7 +148,11 @@ public class Student {
 		String reason = input.nextLine();
 		
 		//TODO get copay amount
-		System.out.println("Your copay for this appointment is $" + ReasonableCare.getCopay(studentID) + ".");
+		try {
+			System.out.println("Your copay for this appointment is $" + ReasonableCare.getCopay(studentID) + ".");
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
 
 		System.out.println("Please enter your billing address:");
 		String address = input.nextLine();
@@ -167,6 +178,8 @@ public class Student {
 	}
 	
 	public static void viewBillingInfo(int studentID) {
+		Scanner scan = new Scanner(System.in);
+		System.out.println("Please enter an appointment date: ");
 		System.out.println("(this view is not yet unimplemented)");
 	}
 	
@@ -182,7 +195,7 @@ public class Student {
 	
 	private static void viewInsuranceInformation(int studentID) {
 		System.out.println("Your current insurance information is:");
-		System.out.println("(this view is not yet unimplemented)");
+		ReasonableCare.showInsuranceInfo(id);
 	}
 	
 	private static void runDoctorSearchScenario() {

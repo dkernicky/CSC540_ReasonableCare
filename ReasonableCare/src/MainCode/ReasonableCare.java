@@ -26,20 +26,25 @@ public class ReasonableCare {
 		//start();
 		Scanner input = new Scanner(System.in);
 		//DoctorNurse.runDoctorNurseScenario(input, 10001);
-		Student.runStudentScenario(input, 1102140001);
+		//Student.runStudentScenario(input, 1102140001);
 		
-//		char role = 'R'; // this value will be returned from a query on user id
-//		switch (role){
-//			case 'R':
-//				boolean loggedIn = true;
-//				while(loggedIn){
-//					System.out.println("calling Receptionist.runReceptionistScenario()");
-//					loggedIn = Receptionist.runReceptionistScenario(input, 30001);
-//				}
-//				break;
-//			default:
-//				System.out.println("login failed");
-//		}
+		char role = 'D'; // this value will be returned from a query on user id
+		boolean loggedIn = true;
+		switch (role){
+			case 'R':
+				while(loggedIn){
+					System.out.println("calling Receptionist.runReceptionistScenario()");
+					loggedIn = Receptionist.runReceptionistScenario(input, 30001);
+				}
+				break;
+			case 'D':
+				while(loggedIn){
+					loggedIn = DoctorNurse.runDoctorNurseScenario(input, 10001);
+				}
+				break;
+			default:
+				System.out.println("login failed");
+		}
 		close();
 		input.close();
 	}
@@ -235,9 +240,9 @@ public class ReasonableCare {
 	public static void updateStudent(int id, String name, int age, char gender, String phone, String address, String dateOfBirth, String ssn, int vacc){
 		try{
 			updatePerson(id, name, age, gender, phone, address);
-			int rows = statement.executeUpdate("UPDATE student set date_of_birth =  to_date(" +
-					dateOfBirth + ", 'DD-MON-YYYY'), ssn = " + ssn + ", vacc = " + vacc + "WHERE "
-					+ "id = " + id);
+			int rows = statement.executeUpdate("UPDATE student set date_of_birth=to_date('" +
+					dateOfBirth + "', 'DD-MON-YYYY'), ssn='" + ssn + "', vacc=" + vacc + " WHERE "
+					+ "id=" + id);
 			if(rows == 0){
 				System.out.println("Invalid information provided.");
 			}
@@ -252,9 +257,9 @@ public class ReasonableCare {
 	public static int updatePerson(int id, String name, int age, char gender, String phone,
 			String address){
 		try{
-			int rows = statement.executeUpdate("UPDATE person SET name = " + name + ", age = " +
-					age + ", gender = " + gender + ", phone = " + phone + ", address = " +
-					address + "WHERE id = " + id);
+			int rows = statement.executeUpdate("UPDATE person SET name='" + name + "', age = " +
+					age + ", gender='" + gender + "', phone_num='" + phone + "', address='" +
+					address + "' WHERE id=" + id);
 			return rows;
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
@@ -267,8 +272,8 @@ public class ReasonableCare {
 		try{
 			connection.setAutoCommit(false);
 			int status = updatePerson(id, name, age, gender, phone, address);
-			int rows = statement.executeUpdate("UPDATE staff set jobTitle = " + jobTitle + 
-					", department = " + department + "WHERE id = " + id);
+			int rows = statement.executeUpdate("UPDATE staff set job_title='" + jobTitle + 
+					"', department='" + department + "' WHERE id=" + id);
 			if(rows == 1 && status == 1) {
 				System.out.println("Information updated.");
 				connection.commit();
@@ -291,8 +296,8 @@ public class ReasonableCare {
 			String address, char jobTitle, String department, String profTitle){
 		try{
 			updateStaff(id, name, age, gender, phone, address, jobTitle, department);
-			int rows = statement.executeUpdate("UPDATE doctor SET professional_title=" + profTitle
-					+ "WHERE id=" + id);
+			int rows = statement.executeUpdate("UPDATE doctor SET professional_title='" + profTitle
+					+ "' WHERE id=" + id);
 			if(rows == 0){
 				System.out.println("Invalid information provided.");
 			}
@@ -313,9 +318,10 @@ public class ReasonableCare {
 			if(copayment == 0)
 				copayment = 30;
 			
-			int rows = statement.executeUpdate("UPDATE health_insurance set ins_name = " + 
-					insName + ", policy_num = " + policyNum + ", start_date = " + start + ", "
-					+ "end_date =" + end + ", copayment = " + copayment + " WHERE s_id = " + studentID);
+			int rows = statement.executeUpdate("UPDATE health_insurance set ins_name='" + 
+					insName + "', policy_num='" + policyNum + "', start_date=to_date('" +
+					start + "', 'DD-MON-YYYY'), end_date=to_date('" + end + "', 'DD-MON-YYYY'), "
+					+ "copayment=" + copayment + " WHERE s_id=" + studentID);
 			if(rows == 0){
 				System.out.println("Invalid insurance information provided.");
 			}
@@ -330,10 +336,10 @@ public class ReasonableCare {
 	public void updateAppointment(int id, int studentID, int staffID, String reason, String date,
 			String start, String end, float amt, String notes) {
 		try{
-			int rows = statement.executeUpdate("UPDATE appointment set reason = " + reason + ", "
-					+ "appt_date =  to_date(" + date + ", 'DD-MON-YYYY'), start_time =  to_date("
-					+ start + ", 'HH:MIPM'), end_time =  to_date(" + end + ", 'HH:MIPM'), amt = "
-					+ amt + ", notes = " + notes + "WHERE id = " + id );
+			int rows = statement.executeUpdate("UPDATE appointment set reason='" + reason + "', "
+					+ "appt_date=to_date('" + date + "', 'DD-MON-YYYY'), start_time=to_date('"
+					+ start + "', 'HH:MIPM'), end_time=to_date('" + end + "', 'HH:MIPM'), amt="
+					+ amt + ", notes='" + notes + "' WHERE id=" + id );
 			System.out.println();
 			if(rows == 0){
 				System.out.println("Invalid appointment information provided.");
@@ -821,7 +827,7 @@ public class ReasonableCare {
 						"end_date, prescription, diagnosis) VALUES (" + appt_id + ", " + s_id +
 						", " + staff_id + ", to_date('" + start_date + "', 'DD-MON-YYYY'), "
 						+ "to_date('" + end_date + "', 'DD-MON-YYYY'), '" + prescription +
-						"', '" + diagnosis + "'";
+						"', '" + diagnosis + "')";
 				int rows = statement.executeUpdate(insert);
 				if(rows == 0){
 					System.out.println("There was an issue entering the given information.");
@@ -837,7 +843,7 @@ public class ReasonableCare {
 	
 	public static void viewPastDoctorInfo(int s_id){
 		try{
-			String query = "SELECT person.name AS name, staff.department AS dept, "+
+			String query = "SELECT DISTINCT person.name AS name, staff.department AS dept, "+
 					"person.phone_num AS phone FROM person INNER JOIN staff ON " +
 					"person.id=staff.id INNER JOIN appointment ON staff.id=appointment.staff_id " +
 					"WHERE appointment.s_id=" + s_id;

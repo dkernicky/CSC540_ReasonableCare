@@ -32,8 +32,9 @@ public class Receptionist {
 	 * @throws SQLException
 	 * 
 	 */
-	public static boolean runReceptionistScenario() throws SQLException {
+	public static boolean runReceptionistScenario(Scanner input, int r_id) {
 		boolean loggedIn = true;
+		id = r_id;
 		
 		// display menu
 		System.out.println("Please select an option:");
@@ -49,31 +50,30 @@ public class Receptionist {
 		System.out.println("10.  Update staff information");		
 		System.out.println("11.  Log out");
 		
-		// take user selection
-		Scanner input = new Scanner(System.in);		
+		// take user selection	
 		int choice = input.nextInt(); input.nextLine();
 		
 		// handle the user selection
 		switch(choice) {
-			case 1:	createStudentAppointment();
+			case 1:	createStudentAppointment(input);
 			break;
-			case 2: cancelStudentAppointment();
+			case 2: cancelStudentAppointment(input);
 			break;
-			case 3:	createOrUpdateStudentAccount(Operation.CREATE);
+			case 3:	createOrUpdateStudentAccount(input, Operation.CREATE);
 			break;
-			case 4:	createOrUpdateStudentAccount(Operation.UPDATE);
+			case 4:	createOrUpdateStudentAccount(input, Operation.UPDATE);
 			break;
-			case 5: createStudentInsuranceInfo(); 
+			case 5: createStudentInsuranceInfo(input); 
 			break;
-			case 6: updateStudentInsuranceInfo(); 
+			case 6: updateStudentInsuranceInfo(input); 
 			break;
-			case 7: viewStudentHolds();
+			case 7: viewStudentHolds(input);
 			break;
-			case 8: viewStudentBillingStatement();
+			case 8: viewStudentBillingStatement(input);
 			break;
-			case 9:	createStaffAccount();
+			case 9:	createStaffAccount(input);
 			break;
-			case 10:updateStaffInformation();
+			case 10:updateStaffInformation(input);
 			break;
 			case 11:loggedIn = false; // this is how we log out
 			break;
@@ -86,9 +86,7 @@ public class Receptionist {
 	 * Displays student holds, if any. Provides a reason,
 	 *  such as insufficient number of vaccinations.
 	 */
-	private static void viewStudentHolds() {
-		Scanner input = new Scanner(System.in);
-		
+	private static void viewStudentHolds(Scanner input) {
 		System.out.println("Please enter the student ID:");
 		int studentID = input.nextInt(); input.nextLine();
 		Student.viewHolds(studentID);
@@ -97,58 +95,48 @@ public class Receptionist {
 	/**
 	 * Displays a bill for an student's appointment
 	 */
-	private static void viewStudentBillingStatement() {
-		Scanner input = new Scanner(System.in);
-		
+	private static void viewStudentBillingStatement(Scanner input) {
 		System.out.println("Please enter the student ID:");
 		int studentID = input.nextInt(); input.nextLine();
 		
-		Student.viewBillingInfo(studentID);
+		Student.viewBillingInfo(input, studentID);
 	}
 
 	/**
 	 * Cancels a student's appointment
 	 */
-	private static void cancelStudentAppointment() {
-		Scanner input = new Scanner(System.in);
-		
+	private static void cancelStudentAppointment(Scanner input) {
 		System.out.println("Please enter the student ID:");
 		int studentID = input.nextInt(); input.nextLine();
 		
-		Student.cancelAppointment(studentID);
+		Student.cancelAppointment(input, studentID);
 	}
 
 	/**
 	 * Adds insurance info associated with student acct
 	 */
-	private static void createStudentInsuranceInfo() {
-		Scanner input = new Scanner(System.in);
-		
+	private static void createStudentInsuranceInfo(Scanner input) {
 		System.out.println("Please enter the student ID:");
 		int studentID = input.nextInt(); input.nextLine();
 		
-		Student.createInsuranceInformation(studentID);
+		Student.createInsuranceInformation(input, studentID);
 	}
 	
 	/**
 	 * Updates insurance info associated with student acct
 	 */
-	private static void updateStudentInsuranceInfo() {		
-		Scanner input = new Scanner(System.in);
-		
+	private static void updateStudentInsuranceInfo(Scanner input) {
 		System.out.println("Please enter the student ID:");
 		int studentID = input.nextInt(); input.nextLine();
 		
-		Student.updateInsuranceInformation(studentID);
+		Student.updateInsuranceInformation(input, studentID);
 	}
 
 
 	/**
 	 * Creates an account for Receptionist, Nurse, or Doctor
 	 */
-	public static void createStaffAccount() {
-		Scanner input = new Scanner(System.in);
-		
+	public static void createStaffAccount(Scanner input) {
 		System.out.println("Please enter the staff ID:");
 		int staffID = input.nextInt(); input.nextLine();
 		
@@ -196,9 +184,7 @@ public class Receptionist {
 	/**
 	 * Updates account info for Doctors, Nurses, and Receptionists
 	 */
-	public static void updateStaffInformation() {
-		Scanner input = new Scanner(System.in);
-		
+	public static void updateStaffInformation(Scanner input) {
 		System.out.println("Please enter the staff ID:");
 		int id = input.nextInt(); input.nextLine();
 
@@ -244,13 +230,11 @@ public class Receptionist {
 	/**
 	 * Creates a student appointment
 	 */
-	public static void createStudentAppointment(){
-		Scanner input = new Scanner(System.in);
+	public static void createStudentAppointment(Scanner input){
 		System.out.println("Please enter the student ID:");
 		int studentID = input.nextInt(); input.nextLine();
 		
-		Student.runAppointmentScenario(studentID);
-		input.close();
+		Student.runAppointmentScenario(input, studentID);
 	}
 
 	/**
@@ -258,9 +242,7 @@ public class Receptionist {
 	 * 
 	 * @param op specifies whether this operation is create or update
 	 */
-	public static void createOrUpdateStudentAccount(Operation op){
-		Scanner input = new Scanner(System.in);
-		
+	public static void createOrUpdateStudentAccount(Scanner input, Operation op){
 		System.out.println("Please enter the student ID:");
 		int studentID = input.nextInt(); input.nextLine();
 		

@@ -2,58 +2,57 @@ package MainCode;
 import java.util.Scanner;
 
 public class DoctorNurse {
-	private int id;
+	private static int id;
 	
-	public void runDoctorNurseScenario(Scanner input, int login_id){
+	public static boolean runDoctorNurseScenario(Scanner input, int login_id){
 		int choice = 0;
-		while(choice != 7){
-			id = login_id;
-			System.out.println("Please select an option:");
-			System.out.println("1. Find student medical records");
-			System.out.println("2. Add notes to existing appointment");
-			System.out.println("3. Create consulation");
-			System.out.println("4. Generate prescription");
-			System.out.println("5. View past doctors for student");
-			System.out.println("6. Update personal information");
-			System.out.println("7. Logout");
-			
-			choice = input.nextInt();
-			input.nextLine();
-			switch(choice){
-			case 1:
-				getMedicalRecords(input);
-				break;
-			case 2:
-				addNotesToAppointment(input);
-				break;
-			case 3:
-				createConsultation(input);
-				break;
-			case 4:
-				generatePrescription(input);
-				break;
-			case 5:
-				viewPastDoctors(input);
-				break;
-			case 6:
-				updatePersonalInfo(input);
-				break;
-			case 7:
-				break;
-			default:
-				break;
-			}
+		id = login_id;
+		System.out.println("Please select an option:");
+		System.out.println("1. Find student medical records");
+		System.out.println("2. Add notes to existing appointment");
+		System.out.println("3. Create consulation");
+		System.out.println("4. Generate prescription");
+		System.out.println("5. View past doctors for student");
+		System.out.println("6. Update personal information");
+		System.out.println("7. Logout");
+		
+		choice = input.nextInt();
+		input.nextLine();
+		switch(choice){
+		case 1:
+			getMedicalRecords(input);
+			break;
+		case 2:
+			addNotesToAppointment(input);
+			break;
+		case 3:
+			createConsultation(input);
+			break;
+		case 4:
+			generatePrescription(input);
+			break;
+		case 5:
+			viewPastDoctors(input);
+			break;
+		case 6:
+			updatePersonalInfo(input);
+			break;
+		case 7:
+			return false;
+		default:
+			break;
 		}
+		return true;
 	}
 	
-	public void getMedicalRecords(Scanner input){
+	public static void getMedicalRecords(Scanner input){
 		System.out.println("Please enter the student's ID for whom you wish to get medical records:");
 		int s_id = input.nextInt();
 		input.nextLine();
 		ReasonableCare.displayMedicalRecords(s_id);
 	}
 	
-	public void addNotesToAppointment(Scanner input){
+	public static void addNotesToAppointment(Scanner input){
 		System.out.println("Please enter the ID of the student this appointment was for:");
 		int s_id = input.nextInt();
 		input.nextLine();
@@ -67,7 +66,7 @@ public class DoctorNurse {
 	}
 	
 	//public void createAppointment(int studentID, int staffID, String reason, String date, String start, String end, float amt, String notes) {
-	public void createConsultation(Scanner input){
+	public static void createConsultation(Scanner input){
 		System.out.println("Please enter the ID of the student this consultation was for:");
 		int s_id = input.nextInt();
 		input.nextLine();
@@ -80,7 +79,7 @@ public class DoctorNurse {
 		ReasonableCare.createAppointment(s_id, id, "Consultation", date, s_time, note);
 	}
 	
-	public void generatePrescription(Scanner input){
+	public static void generatePrescription(Scanner input){
 		System.out.println("Please enter the ID of the student this prescription is for:");
 		int s_id = input.nextInt();
 		input.nextLine();
@@ -99,14 +98,14 @@ public class DoctorNurse {
 		ReasonableCare.createMedicalRecord(s_id, id, appt_date, appt_time, s_date, e_date, prescription, diagnosis);
 	}
 	
-	public void viewPastDoctors(Scanner input){
+	public static void viewPastDoctors(Scanner input){
 		System.out.println("Please enter the ID of the student for whom you would like to view past doctors:");
 		int s_id = input.nextInt();
 		input.nextLine();
 		ReasonableCare.viewPastDoctorInfo(s_id);
 	}
 	
-	public void updatePersonalInfo(Scanner input){
+	public static void updatePersonalInfo(Scanner input){
 		System.out.println("Please enter your name:");
 		String name = input.nextLine();
 		System.out.println("Please enter your age:");

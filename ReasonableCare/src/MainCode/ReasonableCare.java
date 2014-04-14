@@ -9,8 +9,8 @@ import java.util.Scanner;
 public class ReasonableCare {
 	private static final String jdbcURL = "jdbc:oracle:thin:@ora.csc.ncsu.edu:1521:orcl";
 	// Put your oracle ID and password here
-	private static final String user = "djkernic";
-	private static final String password = "001101409";
+	private static final String user = "shwhite3";
+	private static final String password = "200025411";
 
 	private static Connection connection = null;
 	private static Statement statement = null;
@@ -21,35 +21,32 @@ public class ReasonableCare {
 		initialize();
 		System.out.println("after initialize");
 		//start();
-		DoctorNurse test = new DoctorNurse();
 		Scanner input = new Scanner(System.in);
-		test.runDoctorNurseScenario(input, 10001);
+		DoctorNurse.runDoctorNurseScenario(input, 10001);
 		//Student.runStudentScenario(1102140001);
 		
 		char role = 'R'; // this value will be returned from a query on user id
 		switch (role){
-			case 'R':{
-						boolean loggedIn = true;
-						while(loggedIn){
-							System.out.println("calling Receptionist.runReceptionistScenario()");
-							loggedIn = Receptionist.runReceptionistScenario();
-						}
-					}
-			break;
+			case 'R':
+				boolean loggedIn = true;
+				while(loggedIn){
+					System.out.println("calling Receptionist.runReceptionistScenario()");
+					loggedIn = Receptionist.runReceptionistScenario(input, 30001);
+				}
+				break;
+			default:
+				System.out.println("login failed");
 		}
 		close();
 		input.close();
 	}
 	
 	
-	public static void start() {
-		Scanner scan = new Scanner(System.in);
-		
+	public static void start(Scanner input) {
 		System.out.println("Welcome to the Reasonable Care Database System \nPlease enter your login id:");
-		String loginID = scan.nextLine();
+		String loginID = input.nextLine();
 		System.out.println("Please enter your password:");
-		String loginPwd = scan.nextLine();
-		scan.close();
+		String loginPwd = input.nextLine();
 	}
 	
 	// **********************************************************

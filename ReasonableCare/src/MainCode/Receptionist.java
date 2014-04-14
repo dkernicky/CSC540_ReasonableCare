@@ -8,22 +8,23 @@ public class Receptionist {
 	private static int id;
 	private enum Operation {CREATE, UPDATE};
 	
-	public static void runReceptionistScenario() throws SQLException {
-		Scanner input = new Scanner(System.in);
-		System.out.println("Please select an option:");
+	public static boolean runReceptionistScenario() throws SQLException {
+		boolean loggedIn = true;
 		
-		int choice = input.nextInt();
+		Scanner input = new Scanner(System.in);		
 		System.out.println("Please select an option:");
 		System.out.println("1.  Make an appointment");
 		System.out.println("2.  Cancel an appointment");
 		System.out.println("3.  Create a student account");
 		System.out.println("4.  Update student information");
-		System.out.println("5.  Add student insurance info");
+		System.out.println("5.  Create student insurance info");
 		System.out.println("6.  Update student insurance info");
 		System.out.println("7.  View student holds");
 		System.out.println("8.  View student billing statement");
 		System.out.println("9.  Create a staff account");
 		System.out.println("10.  Update staff information");
+		System.out.println("11.  Log out");
+		int choice = input.nextInt();
 		
 // ADD INSURANCE INFO FOR STUDENT
 		
@@ -48,7 +49,11 @@ public class Receptionist {
 			break;
 			case 10:updateStaffInformation();
 			break;
+			case 11:loggedIn = false;
+			break;
+			
 		}
+		return loggedIn;
 	}
 
 	private static void viewStudentHolds() {

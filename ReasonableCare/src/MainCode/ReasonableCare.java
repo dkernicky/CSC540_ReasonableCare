@@ -20,9 +20,12 @@ public class ReasonableCare {
 	private static ResultSet result = null;
 
 	public static void main(String[] args) throws SQLException {
+		//initialize the database
 		initialize();
 		Scanner input = new Scanner(System.in);
-		System.out.println("Welcome to the Reasonable Care Database System \nPlease enter your login id:");
+		System.out.println("Welcome to the Reasonable Care Database System");
+		//get login information from the user
+		System.out.println("Please enter your login id:");
 		int loginID = input.nextInt();
 		input.nextLine();
 		System.out.println("Please enter your password:");
@@ -30,10 +33,10 @@ public class ReasonableCare {
 		char role = getLoginInfo(loginID, loginPwd);
 		
 		boolean loggedIn = true;
+		//assign view based on the user's permissions
 		switch (role){
 			case 'R':
 				while(loggedIn){
-					System.out.println("calling Receptionist.runReceptionistScenario()");
 					loggedIn = Receptionist.runReceptionistScenario(input, loginID);
 				}
 				break;
@@ -49,6 +52,7 @@ public class ReasonableCare {
 			default:
 				System.out.println("Login failed.");
 		}
+		//close the database
 		close();
 		input.close();
 	}
@@ -58,6 +62,7 @@ public class ReasonableCare {
 	// **********************************************************
 	// ** Manage User Accounts **
 	
+	//verify login info entered by the user
 	public static char getLoginInfo(int id, String pwd){
 		try{
 			String query = "SELECT * FROM login WHERE id=" + id + " AND pwd='" + pwd + "'";
@@ -81,6 +86,7 @@ public class ReasonableCare {
 			System.out.println("Billing Statements for Student ID " + id);
 			System.out.println("------------------------------------------------------");
 			System.out.println();
+			//print out the results found in the database
 			while(result.next()){
 				String date = result.getString("appt_date");
 				String time = result.getString("start_time");
@@ -106,7 +112,7 @@ public class ReasonableCare {
 			System.out.println(e.getMessage()); }
 	}
 	
-	// create a person in the db
+	// create a person in the database
 	public static int createPerson(int id, String name, int age, char gender, String phone,
 			String address, char permissions) {
 		try {
@@ -127,7 +133,7 @@ public class ReasonableCare {
 		return 0;
 	}
 	
-	// create a student
+	// create a student in the database
 	public static void createStudent(int id, String name, int age, char gender, String phone, String address, String dateOfBirth, String ssn, int vacc) {
 		try {
 			connection.setAutoCommit(false);
@@ -177,7 +183,7 @@ public class ReasonableCare {
 		}
 	}
 	
-	// create a doctor in the db
+	// create a doctor in the database
 	public static void createDoctor(int id, String name, int age, char gender, char jobTitle, String profTitle, String department, String phone, String address) {
 		try {
 			createStaff(id, name, age, gender, jobTitle, department, phone, address);
@@ -194,6 +200,7 @@ public class ReasonableCare {
 		}
 	}
 	
+	//add student insurance information into the database
 	public static void createInsuranceInfo(int studentID, String insName, String policyNum, String start, String end, float copayment){
 		try{
 			int rows = statement.executeUpdate("INSERT INTO health_insurance(s_id, ins_name, "
@@ -211,6 +218,7 @@ public class ReasonableCare {
 		}
 	}
 	
+	//create a billing statement for the student when they generate an appointment
 	public static void createBillingStatement(int s_id, String appt_date, String appt_time, String addr, String type, String num, String company) {
 		try{
 			String query = "SELECT id FROM appointment WHERE s_id=" + s_id + " AND appt_date=to_date('" + appt_date + "', 'DD-MON-YYYY') AND " +
@@ -238,7 +246,6 @@ public class ReasonableCare {
 	public static void createAppointment(int studentID, int staffID, String reason, String date, String start, String notes) {
 		try {
 			float amtBilled = 50;
-			//String endTime = calculateEndTime(start);
 			int rows = statement.executeUpdate("INSERT INTO appointment(id, s_id, staff_id, "
 					+ "reason, appt_date, start_time, end_time, amt_billed, notes) VALUES "
 					+ "(appointment_seq.nextVal, " + studentID + ", " + staffID + ", '" + reason
@@ -256,6 +263,7 @@ public class ReasonableCare {
 		}
 	}
 	
+	//update a student entry in the database
 	public static void updateStudent(int id, String name, int age, char gender, String phone, String address, String dateOfBirth, String ssn, int vacc){
 		try{
 			updatePerson(id, name, age, gender, phone, address);
@@ -273,6 +281,7 @@ public class ReasonableCare {
 		}
 	}
 	
+	//update a person entry in the database
 	public static int updatePerson(int id, String name, int age, char gender, String phone,
 			String address){
 		try{
@@ -286,6 +295,7 @@ public class ReasonableCare {
 		return 0;
 	}
 	
+	//update a staff entry in the database
 	public static void updateStaff(int id, String name, int age, char gender, String phone,
 			String address, char jobTitle, String department){
 		try{
@@ -311,6 +321,7 @@ public class ReasonableCare {
 		}
 	}
 	
+	//update a doctor entry in the database
 	public static void updateDoctor(int id, String name, int age, char gender, String phone,
 			String address, char jobTitle, String department, String profTitle){
 		try{
@@ -328,6 +339,7 @@ public class ReasonableCare {
 		}
 	}
 	
+	//update insurance information for a student
 	public static void updateInsuranceInfo(int studentID, String insName, String policyNum, String start, String end, float copayment){
 		try{
 			if(start == null || start.isEmpty()) 
@@ -352,6 +364,7 @@ public class ReasonableCare {
 		}
 	}
 	
+	//update appointment information in the database
 	public void updateAppointment(int id, int studentID, int staffID, String reason, String date,
 			String start, String end, float amt, String notes) {
 		try{
@@ -372,12 +385,14 @@ public class ReasonableCare {
 		}
 	}
 	
+	//method for viewing records of a student's past appointments
 	public static void viewPastAppointmentInfo(int studentID) throws SQLException {
 		String query = "SELECT * from appointment WHERE s_id = " + studentID + " AND sysdate > appt_date";
 		result = statement.executeQuery(query);
 		System.out.println("Past appointments for Student ID " + studentID);
 		System.out.println("------------------------------------------------------");
 		System.out.println();
+		//printing out the results of the query
 		while(result.next()){
 			int staff_id = result.getInt("staff_id");
 			String reason = result.getString("reason");
@@ -399,12 +414,14 @@ public class ReasonableCare {
 		}
 	}
 	
+	//method for viewing upcoming appointments for a student
 	public static void viewUpcomingAppointmentInfo(int studentID) throws SQLException {
 		String query = "SELECT * from appointment WHERE s_id = " + studentID + " AND sysdate <= appt_date";
 		result = statement.executeQuery(query);
 		System.out.println("Upcoming appointments for Student ID " + studentID);
 		System.out.println("------------------------------------------------------");
 		System.out.println();
+		//printing out results from the query
 		while(result.next()){
 			int staff_id = result.getInt("staff_id");
 			String reason = result.getString("reason");
@@ -437,12 +454,14 @@ public class ReasonableCare {
 		}
 	}
 	
+	//method for showing a student's insurance information
 	public static void showInsuranceInfo(int id) {
 		try{
 			String query = "SELECT * FROM health_insurance WHERE s_id=" + id;
 			result = statement.executeQuery(query);
 			//s_id, ins_name, policy_num, start_date, end_date, copayment
 			System.out.println();
+			//printing results from the query
 			if(result.next()) {
 				String ins_name = result.getString("ins_name");
 				String policy_num = result.getString("policy_num");
@@ -564,54 +583,7 @@ public class ReasonableCare {
 	
 	//methods for making or cancelling appointments with doctors
 	
-	/*public static void studentSearchForSpecialist(String specialization){
-		try{
-			String query = "SELECT person.name as name, staff.department as specialization, " +
-					"doctor_schedule.days_available as available, doctor_schedule.start_time as "
-					+ "start_time, doctor_schedule.end_time as end_time FROM ((staff INNER JOIN "
-					+ "person ON staff.id=person.id) INNER JOIN doctor_schedule ON "
-					+ "doctor_schedule.d_id=staff.id) WHERE specialization='" + specialization +
-					"'";
-			result = statement.executeQuery(query);
-			System.out.println();
-			System.out.println("------------------------------------------------------");
-			System.out.println();
-			while(result.next()){
-				String name = result.getString("name");
-				String availability = result.getString("available");
-				String start_time = result.getString("start_time");
-				String end_time = result.getString("end_time");System.out.println("Name: " + name);
-				System.out.println("Staff ID: " + staff_id);
-				System.out.println("Specialization: " + specialization);
-				System.out.println("Phone: " + phone);
-				System.out.println("Days available: " + availability);
-				String hours = start_time.substring(11, 16) + "-" + end_time.substring(11, 16);
-				System.out.println("Work hours: " + hours);
-				System.out.println();
-				System.out.println("------------------------------------------------------");
-				System.out.println();
-			}
-		} catch(SQLException e) {
-			System.out.println(e.getMessage());
-		}
-	}*/
-	
-	// return id of first specialist with name match
-	public static int searchForSpecialistByName(String name){
-		try{
-			String query = "SELECT id FROM person WHERE name='" + name + "'";
-			result = statement.executeQuery(query);
-			if(result.next()){
-				//System.out.println(result.getInt("id"));
-				
-				return result.getInt("id");
-			}
-		} catch(SQLException e) {
-			System.out.println(e.getMessage());
-		}
-		return 0;
-	}
-	
+	//method for finding a specialist a student wants to see
 	public static void searchForSpecialist(String specialization){
 		try{
 			String query = "";
@@ -636,6 +608,7 @@ public class ReasonableCare {
 			System.out.println();
 			System.out.println("------------------------------------------------------");
 			System.out.println();
+			//print results of the search query
 			while(result.next()){
 				String name = result.getString("name");
 				int staff_id = result.getInt("staff_id");
@@ -659,6 +632,7 @@ public class ReasonableCare {
 		}
 	}
 	
+	//method for viewing all past and upcoming appointments for a student
 	public void viewStudentAppointments(int student_id){
 		try{
 			String query = "SELECT * FROM appointment WHERE student_id=" + student_id + ";";
@@ -691,14 +665,16 @@ public class ReasonableCare {
 		}
 	}
 	
-	public void viewDoctorAppointments(int doctor_id){
+	//method for viewing a doctor's appointments
+	public static void viewDoctorAppointments(int doctor_id){
 		try{
-			String query = "SELECT * FROM appointment WHERE doctor_id=" + doctor_id + ";";
+			String query = "SELECT * FROM appointment WHERE staff_id=" + doctor_id;
 			result = statement.executeQuery(query);
 			System.out.println();
-			System.out.println("Appointments for Doctor ID " + doctor_id);
+			System.out.println("Appointments for Staff ID " + doctor_id);
 			System.out.println("------------------------------------------------------");
 			System.out.println();
+			//printing out results of the query
 			while(result.next()){
 				int s_id = result.getInt("s_id");
 				String reason = result.getString("reason");
@@ -721,17 +697,7 @@ public class ReasonableCare {
 		}
 	}
 	
-	public static void viewDoctorAppointmentsByDate(int doctor_id, String apptDate){
-		try{
-			String query = "SELECT * FROM appointment WHERE doctor_id=" + doctor_id 
-					+ "AND appt_date=to_date('" + apptDate + "', 'DD-MON-YYYY');";
-			result = statement.executeQuery(query);
-			while(result.next()){
-				System.out.println();
-			}
-		} catch(SQLException e) {}
-	}
-	
+	//method for cancelling an upcoming appointment
 	public static void cancelAppointment(int student_id, String date, String start_time){
 		try{
 			String update = "DELETE FROM appointment WHERE s_id=" + student_id +
@@ -751,16 +717,17 @@ public class ReasonableCare {
 		}
 	}
 	
+	//method for displaying a student's medical records
 	public static void displayMedicalRecords(int student_id){
 		try{
+			//first get the medical history
 			String query = "SELECT * FROM medical_record WHERE s_id=" + student_id;
-			//String query = "SELECT * FROM medical_record RIGHT OUTER JOIN appointment ON " +
-			//		"medical_record.appt_id=appointment.id WHERE appointment.s_id=" + student_id;
 			result = statement.executeQuery(query);
 			System.out.println();
 			System.out.println("Prescriptions for Student ID " + student_id);
 			System.out.println("------------------------------------------------------");
 			System.out.println();
+			//printing results from the query
 			while(result.next()){
 				String start_date = result.getString("start_date");
 				String end_date = result.getString("end_date");
@@ -782,11 +749,14 @@ public class ReasonableCare {
 				System.out.println("------------------------------------------------------");
 				System.out.println();
 			}
+			
+			//then get appointment history
 			query = "SELECT * FROM appointment WHERE s_id=" + student_id;
 			result = statement.executeQuery(query);
 			System.out.println("Past Appointments for Student ID " + student_id);
 			System.out.println("------------------------------------------------------");
 			System.out.println();
+			//printing out results from the query
 			while(result.next()){
 				int staff_id = result.getInt("staff_id");
 				String reason = result.getString("reason");
@@ -812,6 +782,7 @@ public class ReasonableCare {
 		}
 	}
 	
+	//method for adding notes to an existing appointment
 	public static void addNoteToAppointment(int s_id, int staff_id, String date, String time,
 			String note){
 		try{
@@ -832,14 +803,17 @@ public class ReasonableCare {
 		}
 	}
 	
+	//method for generating a new medical record for a student
 	public static void createMedicalRecord(int s_id, int staff_id, String appt_date,
 			String appt_time, String start_date, String end_date, String prescription,
 			String diagnosis){
 		try{
+			//get the appointment id this medical record corresponds to
 			String query = "SELECT id FROM appointment WHERE s_id=" + s_id + " AND staff_id=" +
 					staff_id + " AND appt_date=to_date('" + appt_date + "', 'DD-MON-YYYY') AND " +
 					"start_time=to_date('" + appt_time + "', 'HH:MIPM')";
 			result = statement.executeQuery(query);
+			//if the appointment information was valid, insert the provided medical record info
 			if(result.next()){
 				int appt_id = result.getInt("id");
 				String insert = "INSERT INTO medical_record(appt_id, s_id, d_id, start_date, " +
@@ -860,6 +834,7 @@ public class ReasonableCare {
 		}
 	}
 	
+	//method for viewing information about doctors a student has seen in the past
 	public static void viewPastDoctorInfo(int s_id){
 		try{
 			String query = "SELECT DISTINCT person.name AS name, staff.department AS dept, "+
@@ -870,6 +845,7 @@ public class ReasonableCare {
 			System.out.println();
 			System.out.println("------------------------------------------------------");
 			System.out.println();
+			//printing out results from the query
 			while(result.next()){
 				String name = result.getString("name");
 				String dept = result.getString("dept");
@@ -886,12 +862,14 @@ public class ReasonableCare {
 		}
 	}
 	
+	//method for initializing the database when the program is run
 	public static void initialize() {
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			connection = DriverManager.getConnection(jdbcURL, user, password);
 			statement = connection.createStatement();
 
+			//dropping existing tables
 			try {
 				statement.executeUpdate("DROP TABLE medical_record ");
 			} catch (SQLException e) {}
@@ -931,6 +909,7 @@ public class ReasonableCare {
 			/* CREATE SEQUENCES */
 			statement.executeUpdate("CREATE SEQUENCE appointment_seq START WITH 16 MINVALUE 0 INCREMENT BY 1");
 
+			//creating tables
 			statement.executeUpdate("CREATE TABLE person(id INT PRIMARY KEY, name VARCHAR(100) NOT NULL, age INT NOT NULL, gender VARCHAR(1) NOT NULL, phone_num VARCHAR(20) NOT NULL, address VARCHAR(100) NOT NULL)");
 			statement.executeUpdate("CREATE TABLE staff(id INT PRIMARY KEY, job_title VARCHAR(1) NOT NULL, department VARCHAR(30), FOREIGN KEY (id) REFERENCES person(id) ON DELETE CASCADE)");
 			statement.executeUpdate("CREATE TABLE doctor(id INT PRIMARY KEY, professional_title VARCHAR(30) NOT NULL, FOREIGN KEY (id) REFERENCES person(id) ON DELETE CASCADE)");
@@ -942,6 +921,7 @@ public class ReasonableCare {
 			statement.executeUpdate("CREATE TABLE doctor_schedule(d_id INT PRIMARY KEY, days_available VARCHAR(5) NOT NULL, start_time DATE NOT NULL, end_time DATE NOT NULL, FOREIGN KEY (d_id) REFERENCES doctor(id))");
 			statement.executeUpdate("CREATE TABLE login(id INT PRIMARY KEY, pwd VARCHAR(10) NOT NULL, permissions VARCHAR(1) NOT NULL, FOREIGN KEY (id) REFERENCES person(id))");
 			
+			//inserting entries into person table
 			statement.executeUpdate("INSERT INTO person(id, name, age, gender, phone_num, address) VALUES (10001, 'John Terry', 48, 'M', '919-100-2101', '106 Cloverdale Ct, Raleigh, NC 27607')");
 			statement.executeUpdate("INSERT INTO person(id, name, age, gender, phone_num, address) VALUES (10501, 'Mary Jobs', 30, 'F', '919-500-1212', '106 RiverDale Ct, Raleigh, NC 27807')");
 			statement.executeUpdate("INSERT INTO person(id, name, age, gender, phone_num, address) VALUES (20001, 'Rebecca Johnston', 36, 'F', '919-853-2744', '1048 Avent Ferry Rd, Raleigh NC 27606')");
@@ -950,18 +930,22 @@ public class ReasonableCare {
 			statement.executeUpdate("INSERT INTO person(id, name, age, gender, phone_num, address) VALUES (1102140001, 'Jason Hunter', 23, 'M', '919-232-1122', '101 Dormant Dr. Cary, NC')");
 			statement.executeUpdate("INSERT INTO person(id, name, age, gender, phone_num, address) VALUES (1102140501, 'Dale Steyn', 30, 'M', '919-456-7890', '150 Rapid Dr. Cary, NC')");
 			
+			//inserting entries into staff table
 			statement.executeUpdate("INSERT INTO staff(id, job_title, department) VALUES (10001, 'D', 'Oncological Surgery')");
 			statement.executeUpdate("INSERT INTO staff(id, job_title, department) VALUES (10501, 'D', 'Oncological Surgery')");
 			statement.executeUpdate("INSERT INTO staff(id, job_title, department) VALUES (20001, 'N', 'Senior Nurse')");
 			statement.executeUpdate("INSERT INTO staff(id, job_title, department) VALUES (20501, 'N', 'Nurse')");
 			statement.executeUpdate("INSERT INTO staff(id, job_title, department) VALUES (30001, 'R', '')");
 
+			//inserting entries into doctor table
 			statement.executeUpdate("INSERT INTO doctor(id, professional_title) VALUES (10001, 'Senior Surgeon')");
 			statement.executeUpdate("INSERT INTO doctor(id, professional_title) VALUES (10501, 'Surgeon')");
 
+			//inserting entries into student table
 			statement.executeUpdate("INSERT INTO student(id, date_of_birth, ssn, vacc) VALUES (1102140001, to_date('23-MAY-1990', 'DD-MON-YYYY'), '677-22-1134', 0)");
 			statement.executeUpdate("INSERT INTO student(id, date_of_birth, ssn, vacc) VALUES (1102140501, to_date('27-JUN-1983', 'DD-MON-YYYY'), '707-12-4531', 3)");
 			
+			//inserting entries into login table
 			statement.executeUpdate("INSERT INTO login(id, pwd, permissions) VALUES (10001, 'password', 'D')");
 			statement.executeUpdate("INSERT INTO login(id, pwd, permissions) VALUES (10501, 'password', 'D')");
 			statement.executeUpdate("INSERT INTO login(id, pwd, permissions) VALUES (20001, 'password', 'D')");
@@ -970,14 +954,19 @@ public class ReasonableCare {
 			statement.executeUpdate("INSERT INTO login(id, pwd, permissions) VALUES (1102140001, 'password', 'S')");
 			statement.executeUpdate("INSERT INTO login(id, pwd, permissions) VALUES (1102140501, 'password', 'S')");
 			
+			//inserting entries into appointment table
 			statement.executeUpdate("INSERT INTO appointment(id, s_id, staff_id, reason, appt_date, start_time, end_time, amt_billed, notes) VALUES (15, 1102140001, 10001, 'Vaccination', to_date('21-APR-2014', 'DD-MON-YYYY'), to_date('4:00PM', 'HH:MIPM'), to_date('5:00PM', 'HH:MIPM'), 100.0, '')");
 			
+			//inserting entries into medical record table
 			statement.executeUpdate("INSERT INTO medical_record(appt_id, s_id, d_id, start_date, end_date, prescription, diagnosis) VALUES (15, 1102140001, 10001, to_date('15-MAR-2011', 'DD-MON-YYYY'), '', 'Pain Killer', 'Broken Bone')");
 			
+			//inserting entries into billing info table
 			statement.executeUpdate("INSERT INTO billing_info(s_id, appt_id, billing_addr, card_type, card_num, card_company) VALUES (1102140001, 15, '101 Dormant Dr. Cary, NC', 'C', '1111-1022-2222-1023', 'VISA')");
 			
+			//inserting entries into health insurance table
 			statement.executeUpdate("INSERT INTO health_insurance(s_id, ins_name, policy_num, start_date, end_date, copayment) VALUES (1102140001, 'Acme', '123456', to_date('15-MAR-2014', 'DD-MON-YYYY'), to_date('14-MAR-2015', 'DD-MON-YYYY'), 30.0)");
 			
+			//inserting entries into doctor schedule table
 			statement.executeUpdate("INSERT INTO doctor_schedule(d_id, days_available, start_time, end_time) VALUES (10001, 'MTWF', to_date('3:00PM', 'HH:MIPM'), to_date('6:00PM', 'HH:MIPM'))");
 			statement.executeUpdate("INSERT INTO doctor_schedule(d_id, days_available, start_time, end_time) VALUES (10501, 'TF', to_date('10:00AM', 'HH:MIPM'), to_date('1:00PM', 'HH:MIPM'))");
 
@@ -988,51 +977,8 @@ public class ReasonableCare {
 			e.printStackTrace();
 		}
 	}
-	
 
-	public static boolean ignoreSQLException(String sqlState) {
-
-		if (sqlState == null) {
-			System.out.println("The SQL state is not defined!");
-			return false;
-		}
-
-		// X0Y32: Jar file already exists in schema
-		if (sqlState.equalsIgnoreCase("X0Y32"))
-			return true;
-
-		// 42Y55: Table already exists in schema
-		if (sqlState.equalsIgnoreCase("42Y55"))
-			return true;
-
-		return false;
-	}
-
-	public static void printSQLException(SQLException ex) {
-
-		for (Throwable e : ex) {
-			if (e instanceof SQLException) {
-				if (ignoreSQLException(((SQLException) e).getSQLState()) == false) {
-
-					e.printStackTrace(System.err);
-					System.err.println("SQLState: "
-							+ ((SQLException) e).getSQLState());
-
-					System.err.println("Error Code: "
-							+ ((SQLException) e).getErrorCode());
-
-					System.err.println("Message: " + e.getMessage());
-
-					Throwable t = ex.getCause();
-					while (t != null) {
-						System.out.println("Cause: " + t);
-						t = t.getCause();
-					}
-				}
-			}
-		}
-	}
-
+	//closes the database
 	public static void close() {
 		if (connection != null) {
 			try {

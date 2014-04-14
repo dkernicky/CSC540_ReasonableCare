@@ -16,7 +16,8 @@ public class DoctorNurse {
 		System.out.println("4. Generate prescription");
 		System.out.println("5. View past doctors for student");
 		System.out.println("6. Update personal information");
-		System.out.println("7. Logout");
+		System.out.println("7. View my appointments");
+		System.out.println("8. Logout");
 		
 		choice = input.nextInt();
 		input.nextLine();
@@ -40,8 +41,11 @@ public class DoctorNurse {
 		case 6:
 			updatePersonalInfo(input);
 			break;
-		//return false if user wishes to log out
 		case 7:
+			viewMyAppointments();
+			break;
+		//return false if user wishes to log out
+		case 8:
 			return false;
 		default:
 			System.out.println("That is an invalid choice.");
@@ -143,5 +147,9 @@ public class DoctorNurse {
 		System.out.println("Please enter your professional title:");
 		String profTitle = input.nextLine();
 		ReasonableCare.updateDoctor(id, name, age, gender, phone, address, jobTitle, department, profTitle);
+	}
+	
+	public static void viewMyAppointments(){
+		ReasonableCare.viewDoctorAppointments(id);
 	}
 }

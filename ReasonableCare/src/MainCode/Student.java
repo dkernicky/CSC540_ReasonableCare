@@ -39,7 +39,7 @@ public class Student {
 			break;
 			case 7:	runDoctorSearchScenario(input);
 			break;
-			case 8:	viewHolds(id);
+			case 8:	ReasonableCare.showHolds(id);
 			break;
 			case 9:	viewBillingInfo(input, id);
 			break;

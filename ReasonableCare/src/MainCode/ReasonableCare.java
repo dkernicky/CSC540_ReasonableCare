@@ -19,7 +19,9 @@ public class ReasonableCare {
 	public static void main(String[] args) throws SQLException {
 		initialize();
 		//start();
-		Student.runStudentScenario(1102140001);
+		DoctorNurse test = new DoctorNurse();
+		test.runDoctorNurseScenario(10001);
+		//Student.runStudentScenario(1102140001);
 		close();
 	}
 	
@@ -254,7 +256,9 @@ public class ReasonableCare {
 			while(result.next()){
 				System.out.println();
 			}
-		} catch(SQLException e) {}
+		} catch(SQLException e) {
+			System.out.println(e.getMessage());
+		}
 	}
 	
 	// return id of first specialist with name match
@@ -267,40 +271,106 @@ public class ReasonableCare {
 				
 				return result.getInt("id");
 			}
-		} catch(SQLException e) {}
+		} catch(SQLException e) {
+			System.out.println(e.getMessage());
+		}
 		return 0;
 	}
 	
 	public static void searchForSpecialist(String specialization){
 		try{
-			String query = "SELECT person.name as name, staff.department as specialization, " +
-					"person.phone_num as phone FROM staff INNER JOIN person ON "+
-					"staff.id=person.id WHERE specialization='" + specialization + "';";
+			String query = "SELECT person.name as name, staff.id as staff_id, staff.department "
+					+ "as specialization, person.phone_num as phone, doctor_schedule.days_available"
+					+ " as availability, doctor_schedule.start_time as start_time, doctor_schedule.end_time"
+					+ " as end_time FROM staff INNER JOIN person ON staff.id=person.id INNER JOIN "
+					+ "doctor_schedule ON staff.id=doctor_schedule.d_id WHERE specialization='"
+					+ specialization + "'";
 			result = statement.executeQuery(query);
+			System.out.println();
+			System.out.println("------------------------------------------------------");
+			System.out.println();
 			while(result.next()){
+				String name = result.getString("name");
+				int staff_id = result.getInt("staff_id");
+				String phone = result.getString("phone");
+				String availability = result.getString("availability");
+				String start_time = result.getString("start_time");
+				String end_time = result.getString("end_time");
+				System.out.println("Name: " + name);
+				System.out.println("Staff ID: " + staff_id);
+				System.out.println("Phone: " + phone);
+				System.out.println("Days available: " + availability);
+				String hours = start_time.substring(11, 16) + "-" + end_time.substring(11, 16);
+				System.out.println("Work hours: " + hours);
+				System.out.println();
+				System.out.println("------------------------------------------------------");
 				System.out.println();
 			}
-		} catch(SQLException e) {}
+		} catch(SQLException e) {
+			System.out.println(e.getMessage());
+		}
 	}
 	
 	public void viewStudentAppointments(int student_id){
 		try{
 			String query = "SELECT * FROM appointment WHERE student_id=" + student_id + ";";
 			result = statement.executeQuery(query);
+			System.out.println();
+			System.out.println("Appointments for Student ID " + student_id);
+			System.out.println("------------------------------------------------------");
+			System.out.println();
 			while(result.next()){
+				int staff_id = result.getInt("staff_id");
+				String reason = result.getString("reason");
+				String appt_date = result.getString("appt_date");
+				String start_time = result.getString("start_time");
+				String end_time = result.getString("end_time");
+				float amt_billed = result.getFloat("amt_owed");
+				String notes = result.getString("notes");
+				System.out.println("Staff ID: " + staff_id);
+				System.out.println("Reason for visit: " + reason);
+				System.out.println("Date: " + appt_date.substring(0, 10));
+				System.out.println("Start time: " + start_time.substring(11, 16));
+				System.out.println("End time: " + end_time.substring(11, 16));
+				System.out.println("Amount billed: " + amt_billed);
+				System.out.println("Notes: " + notes);
+				System.out.println();
+				System.out.println("------------------------------------------------------");
 				System.out.println();
 			}
-		} catch(SQLException e) {}
+		} catch(SQLException e) {
+			System.out.println(e.getMessage());
+		}
 	}
 	
 	public void viewDoctorAppointments(int doctor_id){
 		try{
 			String query = "SELECT * FROM appointment WHERE doctor_id=" + doctor_id + ";";
 			result = statement.executeQuery(query);
+			System.out.println();
+			System.out.println("Appointments for Doctor ID " + doctor_id);
+			System.out.println("------------------------------------------------------");
+			System.out.println();
 			while(result.next()){
+				int s_id = result.getInt("s_id");
+				String reason = result.getString("reason");
+				String appt_date = result.getString("appt_date");
+				String start_time = result.getString("start_time");
+				String end_time = result.getString("end_time");
+				String notes = result.getString("notes");
+				System.out.println("Student ID: " + s_id);
+				System.out.println("Reason for visit: " + reason);
+				System.out.println("Date: " + appt_date.substring(0, 10));
+				System.out.println("Start time: " + start_time.substring(11, 16));
+				System.out.println("End time: " + end_time.substring(11, 16));
+				System.out.println("Notes: " + notes);
+				System.out.println();
+				System.out.println("------------------------------------------------------");
 				System.out.println();
 			}
-		} catch(SQLException e) {}
+		} catch(SQLException e) {
+			System.out.println(e.getMessage());
+		}
 	}
 	
 	public static void viewDoctorAppointmentsByDate(int doctor_id, String apptDate){
@@ -318,65 +388,148 @@ public class ReasonableCare {
 		try{
 			String update = "DELETE FROM appointment WHERE student_id=" + student_id +
 					" AND appt_date=to_date('" + date + "', 'DD-MON-YYYY') AND start_time=" +
-					"to_date('" + start_time + "', 'HH:MIPM')";
-			statement.executeUpdate(update);
-		} catch(SQLException e) {}
-	}
-	
-	public void displayVaccinations(int student_id){
-		try{
-			String query = "SELECT * FROM appointment WHERE reason='Vaccination' AND " +
-					"student_id=" + student_id + ";";
-			result = statement.executeQuery(query);
-			while(result.next()){
-				System.out.println();
+					"to_date('" + start_time + "', 'HH:MIPM') AND to_date(sysdate,"
+					+ " 'DD-MON-YYYY:HH:MIPM')" + "<to_date('" + date + ":" + start_time + "',"
+					+ " 'DD-MON-YYYY:HH:MIPM')";
+			int rows = statement.executeUpdate(update);
+			if(rows == 0){
+				System.out.println("There were no appointments scheduled for the given time.");
 			}
-		} catch(SQLException e) {}
+			else{
+				System.out.println("Your appointment was cancelled.");
+			}
+		} catch(SQLException e) {
+			System.out.println(e.getMessage());
+		}
 	}
 	
 	public static void displayMedicalRecords(int student_id){
 		try{
-			String query = "SELECT * FROM medical_record RIGHT OUTER JOIN appointment ON " +
-					"medical_record.appt_id=appointment.id WHERE appointment.s_id=student_id";
+			String query = "SELECT * FROM medical_record WHERE s_id=" + student_id;
+			//String query = "SELECT * FROM medical_record RIGHT OUTER JOIN appointment ON " +
+			//		"medical_record.appt_id=appointment.id WHERE appointment.s_id=" + student_id;
 			result = statement.executeQuery(query);
+			System.out.println();
+			System.out.println("Prescriptions for Student ID " + student_id);
+			System.out.println("------------------------------------------------------");
+			System.out.println();
 			while(result.next()){
+				String start_date = result.getString("start_date");
+				String end_date = result.getString("end_date");
+				String prescription = result.getString("prescription");
+				String diagnosis = result.getString("diagnosis");
+				int d_id = result.getInt("d_id");
+				System.out.println("Responsible doctor: " + d_id);
+				System.out.println("Diagnosis: " + diagnosis);
+				System.out.println("Prescription: " + prescription);
+				System.out.println("Start date: " + start_date.substring(0, 10));
+				if(end_date != null){
+					end_date = end_date.substring(0, 10);
+				}
+				else{
+					end_date = "N/A";
+				}
+				System.out.println("End date: " + end_date);
+				System.out.println();
+				System.out.println("------------------------------------------------------");
 				System.out.println();
 			}
-		} catch(SQLException e) {}
+			query = "SELECT * FROM appointment WHERE s_id=" + student_id;
+			result = statement.executeQuery(query);
+			System.out.println("Past Appointments for Student ID " + student_id);
+			System.out.println("------------------------------------------------------");
+			System.out.println();
+			while(result.next()){
+				int staff_id = result.getInt("staff_id");
+				String reason = result.getString("reason");
+				String appt_date = result.getString("appt_date");
+				String start_time = result.getString("start_time");
+				String end_time = result.getString("end_time");
+				String notes = result.getString("notes");
+				System.out.println("Staff ID: " + staff_id);
+				System.out.println("Reason: " + reason);
+				System.out.println("Appt date: " + appt_date.substring(0, 10));
+				System.out.println("Start time: " + start_time.substring(11, 16));
+				System.out.println("End time: " + end_time.substring(11, 16));
+				if(notes == null){
+					notes = "N/A";
+				}
+				System.out.println("Notes: " + notes);
+				System.out.println();
+				System.out.println("------------------------------------------------------");
+				System.out.println();
+			}
+		} catch(SQLException e) {
+			System.out.println(e.getMessage());
+		}
 	}
 	
-	public static void addNoteToAppointment(int s_id, int d_id, String date, String time, String note){
+	public static void addNoteToAppointment(int s_id, int staff_id, String date, String time,
+			String note){
 		try{
-			String update = "UPDATE appointment SET note=" + note + " WHERE s_id=" + s_id + " AND " +
-					"d_id=" + d_id + " AND appt_date=to_date('" + date + "', 'DD-MON-YYYY') AND " +
-					"start_time=to_date('" + time + "', 'HH:MIPM')";
-			statement.executeUpdate(update);
-		} catch(SQLException e) {}
+			String update = "UPDATE appointment SET note=" + note + " WHERE s_id=" + s_id +
+					" AND staff_id=" + staff_id + " AND appt_date=to_date('" + date +
+					"', 'DD-MON-YYYY') AND " + "start_time=to_date('" + time + "', 'HH:MIPM')";
+			int rows = statement.executeUpdate(update);
+			if(rows == 0){
+				System.out.println("The appointment information provided was invalid.");
+			}
+		} catch(SQLException e) {
+			System.out.println(e.getMessage());
+		}
 	}
 	
-	public static void createMedicalRecord(int s_id, int d_id, String appt_date, String appt_time,
-			String start_date, String end_date, String prescription, String diagnosis){
+	public static void createMedicalRecord(int s_id, int staff_id, String appt_date,
+			String appt_time, String start_date, String end_date, String prescription,
+			String diagnosis){
 		try{
-			String query = "SELECT id FROM appointment WHERE s_id=" + s_id + " AND d_id=" + d_id
-					+ " AND appt_date=to_date('" + appt_date + "', 'DD-MON-YYYY') AND " +
+			String query = "SELECT id FROM appointment WHERE s_id=" + s_id + " AND staff_id=" +
+					staff_id + " AND appt_date=to_date('" + appt_date + "', 'DD-MON-YYYY') AND " +
 					"start_time=to_date)'" + appt_time + "', 'HH:MIPM')";
 			result = statement.executeQuery(query);
-			int appt_id = result.getInt("id");
-			String insert = "INSERT INTO medical_record(appt_id, s_id, d_id, start_date, " +
-					"end_date, prescription, diagnosis) VALUES (" + appt_id + ", " + s_id +
-					", " + d_id + ", " + start_date + ", " + end_date + ", " + prescription +
-					", " + diagnosis + ";";
-			statement.executeUpdate(insert);
-		} catch(SQLException e) {}
+			if(result.next()){
+				int appt_id = result.getInt("id");
+				String insert = "INSERT INTO medical_record(appt_id, s_id, staff_id, start_date, " +
+						"end_date, prescription, diagnosis) VALUES (" + appt_id + ", " + s_id +
+						", " + staff_id + ", " + start_date + ", " + end_date + ", " + prescription +
+						", " + diagnosis;
+				int rows = statement.executeUpdate(insert);
+				if(rows == 0){
+					System.out.println("There was an issue entering the given information.");
+				}
+			}
+			else{
+				System.out.println("Some of the information provided was invalid.");
+			}
+		} catch(SQLException e) {
+			System.out.println(e.getMessage());
+		}
 	}
 	
 	public static void viewPastDoctorInfo(int s_id){
 		try{
-			String query = "SELECT person.name, staff.department, person.phone_num FROM person" +
-					" INNER JOIN staff ON person.id=staff.id INNER JOIN appointment ON " +
-					"staff.id=appointment.d_id WHERE appointment.s_id=" + s_id + ";";
+			String query = "SELECT person.name AS name, staff.department AS dept, "+
+					"person.phone_num AS phone FROM person INNER JOIN staff ON " +
+					"person.id=staff.id INNER JOIN appointment ON staff.id=appointment.staff_id " +
+					"WHERE appointment.s_id=" + s_id;
 			result = statement.executeQuery(query);
-		} catch(SQLException e) {}
+			System.out.println();
+			System.out.println("------------------------------------------------------");
+			System.out.println();
+			while(result.next()){
+				String name = result.getString("name");
+				String dept = result.getString("dept");
+				String phone = result.getString("phone");
+				System.out.println("NAME: " + name);
+				System.out.println("DEPT: " + dept);
+				System.out.println("PHONE: " + phone);
+				System.out.println();
+				System.out.println("------------------------------------------------------");
+				System.out.println();
+			}
+		} catch(SQLException e) {
+			System.out.println(e.getMessage());
+		}
 	}
 	
 	public static void initialize() {

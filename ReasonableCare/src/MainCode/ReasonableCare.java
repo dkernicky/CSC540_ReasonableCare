@@ -48,7 +48,8 @@ public class ReasonableCare {
 	}
 	
 	// create a staff member in the db
-	public static void createStaff(int id, char jobTitle, String department) {
+	public static void createStaff(int id, String name, int age, char gender, char jobTitle, String department, String phone, String address) {
+		createPerson(id, name, age, gender, phone, address);
 		try {
 			statement.executeUpdate("INSERT INTO staff(id, job_title, department) VALUES (" + 10001 + ", " + jobTitle + "," + department + ")");
 		} catch (SQLException e) {}
@@ -56,8 +57,7 @@ public class ReasonableCare {
 	
 	// create a doctor in the db
 	public static void createDoctor(int id, String name, int age, char gender, char jobTitle, String profTitle, String department, String phone, String address) {
-		createPerson(id, name, age, gender, phone, address);
-		createStaff(id, jobTitle, department);
+		createStaff(id, name, age, gender, jobTitle, department, phone, address);
 		try {
 			statement.executeUpdate("INSERT INTO doctor(id, professional_title) VALUES (" + id + ", " + profTitle + ")");
 		} catch (SQLException e) {}

@@ -23,6 +23,7 @@ public class Student {
 		//System.out.println("10. Update billing information");
 		
 		int choice = input.nextInt();
+		input.nextLine();
 		switch(choice) {
 			case 1:	runAppointmentScenario(input, id);
 			break;
@@ -52,7 +53,7 @@ public class Student {
 		System.out.println("Please enter the start time of the appointment you wish to cancel:");
 		String time = input.nextLine();
 		ReasonableCare.cancelAppointment(studentID, date, time);
-		System.out.println("Your appointment was successfully cancelled.");
+		//System.out.println("Your appointment was successfully cancelled.");
 
 	}
 	
@@ -164,9 +165,9 @@ public class Student {
 		String company = input.nextLine();
 		System.out.println("Is this a credit card? (Y/N)");
 		String value = input.nextLine();
-		String type = "credit";
+		String type = "c";
 		if(value.equals("N")) {
-			type = "debit";
+			type = "d";
 		}
 		System.out.println("Please enter your card number:");
 		String num = input.nextLine();
@@ -176,8 +177,8 @@ public class Student {
 		boolean verified = ReasonableCare.verifyPayment(type, num, company, address, expDate);
 		if(verified) {
 			//ReasonableCare.createAppointment(id, dID, reason, date, time, "N/A", amt, "");
-			//TODO: create billing statement
 			ReasonableCare.createAppointment(studentID, dID, reason, date, time, "");
+			ReasonableCare.createBillingStatement(id, date, time, address, type, num, company);
 			System.out.println("Your appointment was successfully saved.");
 		}
 	}
@@ -185,6 +186,7 @@ public class Student {
 	// get an appointment date and start time from the user to display their billing statement
 	public static void viewBillingInfo(Scanner input, int studentID) {
 		System.out.println("Please enter an appointment date: ");
+		ReasonableCare.viewBillingInfo(id);
 		System.out.println("(this view is not yet unimplemented)");
 	}
 	

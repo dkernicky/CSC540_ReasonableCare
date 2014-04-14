@@ -11,7 +11,10 @@ public class ReasonableCare {
 	// Put your oracle ID and password here
 	private static final String user = "shwhite3";
 	private static final String password = "200025411";
-
+//	private static final String user = "djkernic";
+//	private static final String password = "001101409";
+	
+	
 	private static Connection connection = null;
 	private static Statement statement = null;
 	private static ResultSet result = null;
@@ -67,9 +70,40 @@ public class ReasonableCare {
 		}
 		return 'I';
 	}
-	
-	public static void viewBillingInfo(int id, int appt_id) {
-		
+
+	// print out all billing information for a student
+	public static void viewBillingInfo(int id) {
+		String query = "SELECT appt_date, start_time, amt_billed, billing_addr, card_type, card_num, card_company from billing_info INNER " +
+				"JOIN appointment ON appointment.id = billing_info.appt_id WHERE billing_info.s_id = " + id + "";
+		try {
+			//TODO: add more (copay)
+			result = statement.executeQuery(query);
+			System.out.println("Billing Statements for Student ID " + id);
+			System.out.println("------------------------------------------------------");
+			System.out.println();
+			while(result.next()){
+				String date = result.getString("appt_date");
+				String time = result.getString("start_time");
+				float amount = result.getFloat("amt_billed");
+				String address = result.getString("billing_addr");
+				String type = result.getString("card_type");
+				String company = result.getString("card_company");
+				String num = result.getString("card_num");
+				System.out.println("Date: " + date.substring(0, 10));
+				System.out.println("Start time: " + time.substring(11, 16));
+				System.out.println("Amount billed: " + amount);
+				System.out.println("Billing Address: " + address);
+				System.out.println("Card Type: " + type);
+				System.out.println("Card Number: " + num);
+				System.out.println("Card Company: " + company);
+
+				System.out.println();
+				System.out.println("------------------------------------------------------");
+				System.out.println();
+				
+			}
+		} catch (SQLException e) {			
+			System.out.println(e.getMessage()); }
 	}
 	
 	// create a person in the db
@@ -173,6 +207,29 @@ public class ReasonableCare {
 				System.out.println("The insurance information was properly created.");
 			}
 		} catch(SQLException e){
+			System.out.println(e.getMessage());
+		}
+	}
+	
+	public static void createBillingStatement(int s_id, String appt_date, String appt_time, String addr, String type, String num, String company) {
+		try{
+			String query = "SELECT id FROM appointment WHERE s_id=" + s_id + " AND appt_date=to_date('" + appt_date + "', 'DD-MON-YYYY') AND " +
+					"start_time=to_date('" + appt_time + "', 'HH:MIPM')";
+			result = statement.executeQuery(query);
+			if(result.next()){
+				int appt_id = result.getInt("id");
+				String insert = "INSERT INTO billing_info(s_id, appt_id, billing_addr, card_type, card_num, card_company) VALUES ( " +
+						s_id + ", " + appt_id + ", '" + addr + "', '" + type + "', '" + num + "', '" + company + "')";
+				
+				int rows = statement.executeUpdate(insert);
+				if(rows == 0){
+					System.out.println("There was an issue entering the given information.");
+				}
+			}
+			else{
+				System.out.println("Some of the information provided was invalid.");
+			}
+		} catch(SQLException e) {
 			System.out.println(e.getMessage());
 		}
 	}
@@ -677,7 +734,7 @@ public class ReasonableCare {
 	
 	public static void cancelAppointment(int student_id, String date, String start_time){
 		try{
-			String update = "DELETE FROM appointment WHERE student_id=" + student_id +
+			String update = "DELETE FROM appointment WHERE s_id=" + student_id +
 					" AND appt_date=to_date('" + date + "', 'DD-MON-YYYY') AND start_time=" +
 					"to_date('" + start_time + "', 'HH:MIPM') AND to_date(sysdate,"
 					+ " 'DD-MON-YYYY:HH:MIPM')" + "<to_date('" + date + ":" + start_time + "',"

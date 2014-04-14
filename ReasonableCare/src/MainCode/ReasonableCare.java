@@ -20,9 +20,11 @@ public class ReasonableCare {
 		initialize();
 		//start();
 		DoctorNurse test = new DoctorNurse();
-		test.runDoctorNurseScenario(10001);
+		Scanner input = new Scanner(System.in);
+		test.runDoctorNurseScenario(input, 10001);
 		//Student.runStudentScenario(1102140001);
 		close();
+		input.close();
 	}
 	
 	
@@ -33,6 +35,7 @@ public class ReasonableCare {
 		String loginID = scan.nextLine();
 		System.out.println("Please enter your password:");
 		String loginPwd = scan.nextLine();
+		scan.close();
 	}
 	
 	// **********************************************************
@@ -126,16 +129,16 @@ public class ReasonableCare {
 	}
 	
 	// create an appointment
-	public static void createAppointment(int studentID, int staffID, String reason, String date, String start, String end, String notes) {
+	public static void createAppointment(int studentID, int staffID, String reason, String date, String start, String notes) {
 		try {
 			float amtBilled = 50;
 			//String endTime = calculateEndTime(start);
 			int rows = statement.executeUpdate("INSERT INTO appointment(id, s_id, staff_id, "
 					+ "reason, appt_date, start_time, end_time, amt_billed, notes) VALUES "
-					+ "(appointment_seq.nextVal, " + studentID + ", " + staffID + ", " + reason
-					+ ",  to_date(" + date + ", 'DD-MON-YYYY'), to_date('" + start + "', "
-					+ "'HH:MIPM'), to_date('" + start +"' + 1/24, 'HH:MIPM')," + amtBilled +
-					", " + notes + ")");
+					+ "(appointment_seq.nextVal, " + studentID + ", " + staffID + ", '" + reason
+					+ "', to_date('" + date + "', 'DD-MON-YYYY'), to_date('" + start + "', "
+					+ "'HH:MIPM'), to_date('" + start +"', 'HH:MIPM') + 1/24, " + amtBilled +
+					", '" + notes + "')");
 			if(rows == 0){
 				System.out.println("The appointment could not be created with the information provided.");
 			}
@@ -677,12 +680,17 @@ public class ReasonableCare {
 	public static void addNoteToAppointment(int s_id, int staff_id, String date, String time,
 			String note){
 		try{
-			String update = "UPDATE appointment SET note=" + note + " WHERE s_id=" + s_id +
+			String update = "UPDATE appointment SET notes='" + note + "' WHERE s_id=" + s_id +
 					" AND staff_id=" + staff_id + " AND appt_date=to_date('" + date +
-					"', 'DD-MON-YYYY') AND " + "start_time=to_date('" + time + "', 'HH:MIPM')";
+					"', 'DD-MON-YYYY') AND start_time=to_date('" + time + "', 'HH:MIPM')";
 			int rows = statement.executeUpdate(update);
 			if(rows == 0){
 				System.out.println("The appointment information provided was invalid.");
+				System.out.println();
+			}
+			else{
+				System.out.println("Your note has been added.");
+				System.out.println();
 			}
 		} catch(SQLException e) {
 			System.out.println(e.getMessage());

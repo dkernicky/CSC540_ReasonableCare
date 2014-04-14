@@ -42,6 +42,7 @@ public class Student {
 			case 9:	viewBillingInfo();
 			break;
 		}
+		input.close();
 	}
 
 	private static void cancelAppointment() {
@@ -52,6 +53,7 @@ public class Student {
 		String time = input.nextLine();
 		ReasonableCare.cancelAppointment(id, date, time);
 		System.out.println("Your appointment was successfully cancelled.");
+		input.close();
 
 	}
 	
@@ -67,6 +69,7 @@ public class Student {
 		System.out.println("Please enter your policy number:");
 		String num = input.nextLine();
 		ReasonableCare.updateInsuranceInfo(id, name, num);
+		input.close();
 	}
 	
 	public static void runAppointmentScenario(int studentID) throws SQLException {
@@ -74,8 +77,10 @@ public class Student {
 		System.out.println("Enter a doctor's name (or 1 to return to the previous menu):");
 		String name = input.nextLine();
 		
-		if (name.equals("1"))
+		if (name.equals("1")){
+			input.close();
 			return;
+		}
 		int dID = -1;
 		dID = ReasonableCare.searchForSpecialistByName(name);
 		
@@ -84,8 +89,10 @@ public class Student {
 		while(!dateIsAvailable){
 			System.out.println("Enter a date (DD-MON-YYYY) or 1 to return to previous menu:");
 			date = input.nextLine();
-			if (date.equals("1"))
+			if (date.equals("1")){
+				input.close();
 				return;
+			}
 			dateIsAvailable = ReasonableCare.doctorAvailable(dID, date);
 			if(!dateIsAvailable) {
 				System.out.println("The date you have entered is not available.");
@@ -98,8 +105,10 @@ public class Student {
 			System.out.println("Enter a time (HH:MMPM) or 1 to return to previous menu:");	
 			//TODO fix code to check for existence between times
 			time = input.nextLine();
-			if (time.equals("1"))
+			if (time.equals("1")){
+				input.close();
 				return;
+			}
 			timeIsAvailable = ReasonableCare.timeAvailable(dID, date, time);
 			if(!timeIsAvailable) {
 				System.out.println("The time you have entered is not available.");
@@ -128,6 +137,7 @@ public class Student {
 			//ReasonableCare.createAppointment(id, dID, reason, date, time, "N/A", amt, "");
 			System.out.println("Your appointment was successfully saved.");
 		}
+		input.close();
 	}
 	
 	private static void viewBillingInfo() {
@@ -154,6 +164,7 @@ public class Student {
 		String s = input.nextLine();
 		System.out.println("Your search returned the following doctors:");
 		ReasonableCare.searchForSpecialist(s);
+		input.close();
 	}
 	
 }

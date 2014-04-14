@@ -1,19 +1,13 @@
 package MainCode;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Scanner;
 
 public class DoctorNurse {
 	private int id;
 	
-	public void runDoctorNurseScenario(int login_id){
+	public void runDoctorNurseScenario(Scanner input, int login_id){
 		int choice = 0;
 		while(choice != 7){
 			id = login_id;
-			Scanner input = new Scanner(System.in);
 			System.out.println("Please select an option:");
 			System.out.println("1. Find student medical records");
 			System.out.println("2. Add notes to existing appointment");
@@ -24,24 +18,25 @@ public class DoctorNurse {
 			System.out.println("7. Logout");
 			
 			choice = input.nextInt();
+			input.nextLine();
 			switch(choice){
 			case 1:
-				getMedicalRecords();
+				getMedicalRecords(input);
 				break;
 			case 2:
-				addNotesToAppointment();
+				addNotesToAppointment(input);
 				break;
 			case 3:
-				createConsultation();
+				createConsultation(input);
 				break;
 			case 4:
-				generatePrescription();
+				generatePrescription(input);
 				break;
 			case 5:
-				viewPastDoctors();
+				viewPastDoctors(input);
 				break;
 			case 6:
-				updatePersonalInfo();
+				updatePersonalInfo(input);
 				break;
 			case 7:
 				break;
@@ -51,15 +46,13 @@ public class DoctorNurse {
 		}
 	}
 	
-	public void getMedicalRecords(){
-		Scanner input = new Scanner(System.in);
+	public void getMedicalRecords(Scanner input){
 		System.out.println("Please enter the student's ID for whom you wish to get medical records:");
 		int s_id = input.nextInt();
 		ReasonableCare.displayMedicalRecords(s_id);
 	}
 	
-	public void addNotesToAppointment(){
-		Scanner input = new Scanner(System.in);
+	public void addNotesToAppointment(Scanner input){
 		System.out.println("Please enter the ID of the student this appointment was for:");
 		int s_id = input.nextInt();
 		input.nextLine();
@@ -73,8 +66,7 @@ public class DoctorNurse {
 	}
 	
 	//public void createAppointment(int studentID, int staffID, String reason, String date, String start, String end, float amt, String notes) {
-	public void createConsultation(){
-		Scanner input = new Scanner(System.in);
+	public void createConsultation(Scanner input){
 		System.out.println("Please enter the ID of the student this consultation was for:");
 		int s_id = input.nextInt();
 		input.nextLine();
@@ -82,15 +74,12 @@ public class DoctorNurse {
 		String date = input.nextLine();
 		System.out.println("Please enter the start time of the consultation (as HH:MIPM):");
 		String s_time = input.nextLine();
-		System.out.println("Please enter the end time of the consultation (as HH:MIPM):");
-		String e_time = input.nextLine();
 		System.out.println("Please enter any notes for the consultation:");
 		String note = input.nextLine();
-		ReasonableCare.createAppointment(s_id, id, "Consultation", date, s_time, e_time, note);
+		ReasonableCare.createAppointment(s_id, id, "Consultation", date, s_time, note);
 	}
 	
-	public void generatePrescription(){
-		Scanner input = new Scanner(System.in);
+	public void generatePrescription(Scanner input){
 		System.out.println("Please enter the ID of the student this prescription is for:");
 		int s_id = input.nextInt();
 		input.nextLine();
@@ -109,8 +98,7 @@ public class DoctorNurse {
 		ReasonableCare.createMedicalRecord(s_id, id, appt_date, appt_time, s_date, e_date, prescription, diagnosis);
 	}
 	
-	public void viewPastDoctors(){
-		Scanner input = new Scanner(System.in);
+	public void viewPastDoctors(Scanner input){
 		System.out.println("Please enter the ID of the student for whom you would like to view past doctors:");
 		String s_string = input.nextLine();
 		int s_id = Integer.parseInt(s_string);
@@ -118,8 +106,7 @@ public class DoctorNurse {
 		ReasonableCare.viewPastDoctorInfo(s_id);
 	}
 	
-	public void updatePersonalInfo(){
-		Scanner input = new Scanner(System.in);
+	public void updatePersonalInfo(Scanner input){
 		System.out.println("Please enter your name:");
 		String name = input.nextLine();
 		System.out.println("Please enter your age:");

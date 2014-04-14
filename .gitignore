@@ -1,3 +1,7 @@
 ReasonableCare/.classpath
 ReasonableCare/bin/*.class
 *.class
+ReasonableCare/bin/MainCode/DoctorNurse.class
+ReasonableCare/bin/MainCode/ReasonableCare.class
+ReasonableCare/bin/MainCode/Receptionist.class
+ReasonableCare/bin/MainCode/Student.class

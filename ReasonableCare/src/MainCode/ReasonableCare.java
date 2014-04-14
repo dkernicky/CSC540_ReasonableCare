@@ -17,58 +17,74 @@ public class ReasonableCare {
 	private static ResultSet result = null;
 
 	public static void main(String[] args) throws SQLException {
-		System.out.println("before initialize");
 		initialize();
-		System.out.println("after initialize");
-		//start();
 		Scanner input = new Scanner(System.in);
-		DoctorNurse.runDoctorNurseScenario(input, 10001);
-		//Student.runStudentScenario(1102140001);
+		System.out.println("Welcome to the Reasonable Care Database System \nPlease enter your login id:");
+		int loginID = input.nextInt();
+		input.nextLine();
+		System.out.println("Please enter your password:");
+		String loginPwd = input.nextLine();
+		char role = getLoginInfo(loginID, loginPwd);
 		
-		char role = 'D'; // this value will be returned from a query on user id
 		boolean loggedIn = true;
 		switch (role){
 			case 'R':
 				while(loggedIn){
 					System.out.println("calling Receptionist.runReceptionistScenario()");
-					loggedIn = Receptionist.runReceptionistScenario(input, 30001);
+					loggedIn = Receptionist.runReceptionistScenario(input, loginID);
 				}
 				break;
 			case 'D':
 				while(loggedIn){
-					loggedIn = DoctorNurse.runDoctorNurseScenario(input, 10001);
+					loggedIn = DoctorNurse.runDoctorNurseScenario(input, loginID);
 				}
 				break;
+			case 'S':
+				while(loggedIn){
+					Student.runStudentScenario(input, loginID);
+				}
 			default:
-				System.out.println("login failed");
+				System.out.println("Login failed.");
 		}
 		close();
 		input.close();
 	}
 	
-	
-	public static void start(Scanner input) {
-		System.out.println("Welcome to the Reasonable Care Database System \nPlease enter your login id:");
-		String loginID = input.nextLine();
-		System.out.println("Please enter your password:");
-		String loginPwd = input.nextLine();
-	}
+
 	
 	// **********************************************************
 	// ** Manage User Accounts **
+	
+	public static char getLoginInfo(int id, String pwd){
+		try{
+			String query = "SELECT * FROM login WHERE id=" + id + " AND pwd='" + pwd + "'";
+			result = statement.executeQuery(query);
+			if(result.next()){
+				return result.getString("permissions").charAt(0);
+			}
+		} catch(SQLException e){
+			System.out.println(e.getMessage());
+		}
+		return 'I';
+	}
 	
 	public static void viewBillingInfo(int id, int appt_id) {
 		
 	}
 	
 	// create a person in the db
-	public static int createPerson(int id, String name, int age, char gender, String phone, String address) {
+	public static int createPerson(int id, String name, int age, char gender, String phone,
+			String address, char permissions) {
 		try {
 			int rows = statement.executeUpdate("INSERT INTO person(id, name, age, gender, "
 					+ "phone_num, address) VALUES (" + id + ", " + name + ", " + age + ", " +
 					gender + ", " + phone + ", " + address +")");
 			if(rows == 0){
 				System.out.println("The person could not be created using the information provided.");
+			}
+			else{
+				statement.executeUpdate("INSERT INTO login(id, pwd, permissions) VALUES ("
+						+ id + ", 'password', '" + permissions + "')");
 			}
 			return rows;
 		} catch (SQLException e) {
@@ -82,7 +98,7 @@ public class ReasonableCare {
 		try {
 			connection.setAutoCommit(false);
 		
-			int status = createPerson(id, name, age, gender, phone, address);
+			int status = createPerson(id, name, age, gender, phone, address, 'S');
 
 			int rows = statement.executeUpdate("INSERT INTO student(id, date_of_birth, ssn, vacc)"
 					+ " VALUES (" + id + ", to_date(" + dateOfBirth + ", 'DD-MON-YYYY'), " +ssn +
@@ -107,10 +123,13 @@ public class ReasonableCare {
 		}
 	}
 	
-	// create a staff member in the db
+	// create a staff member in the database
 	public static void createStaff(int id, String name, int age, char gender, char jobTitle, String department, String phone, String address) {
-		try {	
-			createPerson(id, name, age, gender, phone, address);
+		try {
+			if(jobTitle == 'R')
+				createPerson(id, name, age, gender, phone, address, 'R');
+			else
+				createPerson(id, name, age, gender, phone, address, 'D');
 			int rows = statement.executeUpdate("INSERT INTO staff(id, job_title, department) "
 					+ "VALUES (" + 10001 + ", " + jobTitle + "," + department + ")");
 			if(rows == 0){
@@ -832,6 +851,9 @@ public class ReasonableCare {
 				statement.executeUpdate("DROP TABLE appointment ");
 			} catch (SQLException e) {}
 			try {
+				statement.executeUpdate("DROP TABLE login");
+			} catch (SQLException e) {}
+			try {
 				statement.executeUpdate("DROP TABLE doctor ");
 			} catch (SQLException e) {}
 			try {
@@ -861,6 +883,7 @@ public class ReasonableCare {
 			statement.executeUpdate("CREATE TABLE billing_info(s_id INT PRIMARY KEY, appt_id INT, billing_addr VARCHAR(100) NOT NULL, card_type VARCHAR(1) NOT NULL, card_num VARCHAR(19) NOT NULL, card_company VARCHAR(30) NOT NULL, FOREIGN KEY(s_id) REFERENCES student(id), FOREIGN KEY (appt_id) REFERENCES appointment(id))");
 			statement.executeUpdate("CREATE TABLE health_insurance(s_id INT PRIMARY KEY, ins_name VARCHAR(30) NOT NULL, policy_num VARCHAR(30) NOT NULL, start_date DATE NOT NULL, end_date DATE NOT NULL, copayment FLOAT NOT NULL, FOREIGN KEY (s_id) REFERENCES student(id))");
 			statement.executeUpdate("CREATE TABLE doctor_schedule(d_id INT PRIMARY KEY, days_available VARCHAR(5) NOT NULL, start_time DATE NOT NULL, end_time DATE NOT NULL, FOREIGN KEY (d_id) REFERENCES doctor(id))");
+			statement.executeUpdate("CREATE TABLE login(id INT PRIMARY KEY, pwd VARCHAR(10) NOT NULL, permissions VARCHAR(1) NOT NULL, FOREIGN KEY (id) REFERENCES person(id))");
 			
 			statement.executeUpdate("INSERT INTO person(id, name, age, gender, phone_num, address) VALUES (10001, 'John Terry', 48, 'M', '919-100-2101', '106 Cloverdale Ct, Raleigh, NC 27607')");
 			statement.executeUpdate("INSERT INTO person(id, name, age, gender, phone_num, address) VALUES (10501, 'Mary Jobs', 30, 'F', '919-500-1212', '106 RiverDale Ct, Raleigh, NC 27807')");
@@ -881,6 +904,14 @@ public class ReasonableCare {
 
 			statement.executeUpdate("INSERT INTO student(id, date_of_birth, ssn, vacc) VALUES (1102140001, to_date('23-MAY-1990', 'DD-MON-YYYY'), '677-22-1134', 0)");
 			statement.executeUpdate("INSERT INTO student(id, date_of_birth, ssn, vacc) VALUES (1102140501, to_date('27-JUN-1983', 'DD-MON-YYYY'), '707-12-4531', 3)");
+			
+			statement.executeUpdate("INSERT INTO login(id, pwd, permissions) VALUES (10001, 'password', 'D')");
+			statement.executeUpdate("INSERT INTO login(id, pwd, permissions) VALUES (10501, 'password', 'D')");
+			statement.executeUpdate("INSERT INTO login(id, pwd, permissions) VALUES (20001, 'password', 'D')");
+			statement.executeUpdate("INSERT INTO login(id, pwd, permissions) VALUES (20501, 'password', 'D')");
+			statement.executeUpdate("INSERT INTO login(id, pwd, permissions) VALUES (30001, 'password', 'R')");
+			statement.executeUpdate("INSERT INTO login(id, pwd, permissions) VALUES (1102140001, 'password', 'S')");
+			statement.executeUpdate("INSERT INTO login(id, pwd, permissions) VALUES (1102140501, 'password', 'S')");
 			
 			statement.executeUpdate("INSERT INTO appointment(id, s_id, staff_id, reason, appt_date, start_time, end_time, amt_billed, notes) VALUES (15, 1102140001, 10001, 'Vaccination', to_date('21-APR-2014', 'DD-MON-YYYY'), to_date('4:00PM', 'HH:MIPM'), to_date('5:00PM', 'HH:MIPM'), 100.0, '')");
 			

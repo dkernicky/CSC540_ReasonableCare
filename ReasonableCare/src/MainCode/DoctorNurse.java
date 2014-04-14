@@ -1,9 +1,11 @@
 package MainCode;
 import java.util.Scanner;
 
+//class governing the database permissions of doctors and nurses
 public class DoctorNurse {
 	private static int id;
 	
+	//menu method that displays a list of actions the doctor/nurse can take
 	public static boolean runDoctorNurseScenario(Scanner input, int login_id){
 		int choice = 0;
 		id = login_id;
@@ -18,6 +20,7 @@ public class DoctorNurse {
 		
 		choice = input.nextInt();
 		input.nextLine();
+		//determine action based off the user's input for desired action
 		switch(choice){
 		case 1:
 			getMedicalRecords(input);
@@ -37,14 +40,23 @@ public class DoctorNurse {
 		case 6:
 			updatePersonalInfo(input);
 			break;
+		//return false if user wishes to log out
 		case 7:
 			return false;
 		default:
+			System.out.println("That is an invalid choice.");
 			break;
 		}
 		return true;
 	}
 	
+	/*
+	 * The methods below correspond to the various actions doctors and nurses can take according
+	 * to their database permissions. For each action, relevant information is asked for by
+	 * the program and provided by the user so the corresponding SQL query can be executed.
+	 */
+	
+	//method for displaying a student's medical records
 	public static void getMedicalRecords(Scanner input){
 		System.out.println("Please enter the student's ID for whom you wish to get medical records:");
 		int s_id = input.nextInt();
@@ -52,6 +64,7 @@ public class DoctorNurse {
 		ReasonableCare.displayMedicalRecords(s_id);
 	}
 	
+	//method for adding notes to an existing appointment
 	public static void addNotesToAppointment(Scanner input){
 		System.out.println("Please enter the ID of the student this appointment was for:");
 		int s_id = input.nextInt();
@@ -65,7 +78,7 @@ public class DoctorNurse {
 		ReasonableCare.addNoteToAppointment(s_id, id, date, time, note);
 	}
 	
-	//public void createAppointment(int studentID, int staffID, String reason, String date, String start, String end, float amt, String notes) {
+	//method for creating a consultation appointment with a student
 	public static void createConsultation(Scanner input){
 		System.out.println("Please enter the ID of the student this consultation was for:");
 		int s_id = input.nextInt();
@@ -79,6 +92,7 @@ public class DoctorNurse {
 		ReasonableCare.createAppointment(s_id, id, "Consultation", date, s_time, note);
 	}
 	
+	//method for inserting information about a prescription to a student's medical record
 	public static void generatePrescription(Scanner input){
 		System.out.println("Please enter the ID of the student this prescription is for:");
 		int s_id = input.nextInt();
@@ -98,6 +112,8 @@ public class DoctorNurse {
 		ReasonableCare.createMedicalRecord(s_id, id, appt_date, appt_time, s_date, e_date, prescription, diagnosis);
 	}
 	
+	//method for viewing information about past doctors a student has seen according to their
+	//medical records
 	public static void viewPastDoctors(Scanner input){
 		System.out.println("Please enter the ID of the student for whom you would like to view past doctors:");
 		int s_id = input.nextInt();
@@ -105,6 +121,7 @@ public class DoctorNurse {
 		ReasonableCare.viewPastDoctorInfo(s_id);
 	}
 	
+	//method for updating the user's personal information
 	public static void updatePersonalInfo(Scanner input){
 		System.out.println("Please enter your name:");
 		String name = input.nextLine();

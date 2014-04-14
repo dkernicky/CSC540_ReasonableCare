@@ -78,11 +78,10 @@ public class ReasonableCare {
 	}
 	
 	// create an appointment
-	public static void createAppointment(int studentID, int staffID, String reason, String date, String start, String end, String notes) {
+	public static void createAppointment(int studentID, int staffID, String reason, String date, String start, String notes) {
 		try {
 			float amtBilled = 50;
-			//String endTime = calculateEndTime(start);
-			statement.executeUpdate("INSERT INTO appointment(id, s_id, staff_id, reason, appt_date, start_time, end_time, amt_billed, notes) VALUES (appointment_seq.nextVal, " + studentID + ", " + staffID + ", " + reason + ",  to_date(" + date + ", 'DD-MON-YYYY'), to_date(" + start + ", 'HH:MIPM'), to_date(" + start +" + 1/24    , 'HH:MIPM')," + amtBilled + ", " + notes + ")");
+			statement.executeUpdate("INSERT INTO appointment(id, s_id, staff_id, reason, appt_date, start_time, amt_billed, notes) VALUES (appointment_seq.nextVal, " + studentID + ", " + staffID + ", " + reason + ",  to_date(" + date + ", 'DD-MON-YYYY'), to_date(" + start + ", 'HH:MIPM'), to_date(" + start +" + 1/24    , 'HH:MIPM')," + amtBilled + ", " + notes + ")");
 		} catch (SQLException e) {}
 	}
 	

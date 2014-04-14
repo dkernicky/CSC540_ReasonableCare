@@ -71,6 +71,9 @@ public class Student {
 	
 	public static void runAppointmentScenario(int studentID) throws SQLException {
 		Scanner input = new Scanner(System.in);
+		/*
+		 * search doctor by name
+		 */
 		System.out.println("Enter a doctor's name (or 1 to return to the previous menu):");
 		String name = input.nextLine();
 		
@@ -79,6 +82,9 @@ public class Student {
 		int dID = -1;
 		dID = ReasonableCare.searchForSpecialistByName(name);
 		
+		/*
+		 * select appointment date and time
+		 */
 		String date = null;
 		boolean dateIsAvailable = false;
 		while(!dateIsAvailable){
@@ -105,6 +111,10 @@ public class Student {
 				System.out.println("The time you have entered is not available.");
 			}
 		}
+		
+		System.out.println("Enter a reason for this appointment:");
+		String reason = input.nextLine();
+		
 		//TODO get copay amount
 		System.out.println("Your copay for this appointment is $" + ReasonableCare.getCopay(studentID) + ".");
 
@@ -126,6 +136,7 @@ public class Student {
 		boolean verified = ReasonableCare.verifyPayment(type, num, company, address, expDate);
 		if(verified) {
 			//ReasonableCare.createAppointment(id, dID, reason, date, time, "N/A", amt, "");
+			ReasonableCare.createAppointment(studentID, dID, reason, date, time, "");
 			System.out.println("Your appointment was successfully saved.");
 		}
 	}

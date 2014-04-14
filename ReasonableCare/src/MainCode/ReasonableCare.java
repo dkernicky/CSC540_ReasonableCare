@@ -36,6 +36,10 @@ public class ReasonableCare {
 	// **********************************************************
 	// ** Manage User Accounts **
 	
+	public static void viewBillingInfo(int id, int appt_id) {
+		
+	}
+	
 	// create a person in the db
 	public static void createPerson(int id, String name, int age, char gender, String phone, String address) {
 		try {
@@ -72,9 +76,11 @@ public class ReasonableCare {
 	}
 	
 	// create an appointment
-	public static void createAppointment(int studentID, int staffID, String reason, String date, String start, String end, float amt, String notes) {
+	public static void createAppointment(int studentID, int staffID, String reason, String date, String start, String end, String notes) {
 		try {
-			statement.executeUpdate("INSERT INTO appointment(id, s_id, staff_id, reason, appt_date, start_time, end_time, amt_billed, notes) VALUES (appointment_seq.nextVal, " + studentID + ", " + staffID + ", " + reason + ",  to_date(" + date + ", 'DD-MON-YYYY'), to_date(" + start + ", 'HH:MIPM'), to_date(" + end + ", 'HH:MIPM')," + amt + ", " + notes + ")");
+			float amtBilled = 50;
+			//String endTime = calculateEndTime(start);
+			statement.executeUpdate("INSERT INTO appointment(id, s_id, staff_id, reason, appt_date, start_time, end_time, amt_billed, notes) VALUES (appointment_seq.nextVal, " + studentID + ", " + staffID + ", " + reason + ",  to_date(" + date + ", 'DD-MON-YYYY'), to_date(" + start + ", 'HH:MIPM'), to_date(" + start +" + 1/24    , 'HH:MIPM')," + amtBilled + ", " + notes + ")");
 		} catch (SQLException e) {}
 	}
 	
@@ -192,13 +198,30 @@ public class ReasonableCare {
 		return "";
 	}
 	
+	public static boolean betweenTime(String time, String start, String end) {
+		String query = "SELECT to_date('"+ time +"', 'HH:MIPM') - to_date('"+ start +"', 'HH:MIPM') AS one, to_date('"+ time +"', 'HH:MIPM') - to_date('"+ end +"', 'HH:MIPM') AS two FROM dual";
+		try {
+		result = statement.executeQuery(query);
+			if(result.next()) {
+				float result1 = result.getFloat("one");
+				float result2 = result.getFloat("two");
+				float result = result1*result2;
+				return (result < 0);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
 	public static boolean timeAvailable(int id, String date, String startTime) throws SQLException {
 		startTime = convertToSQLTime(startTime);
 		String query = "SELECT to_char(start_time, 'HH:MIPM') AS \"start\", to_char(end_time, 'HH:MIPM') AS \"end\" FROM appointment WHERE staff_id=" + id + " AND appt_date = to_date('" + date + "', 'DD-MON-YYYY')";
 		result = statement.executeQuery(query);
 			if(result.next()){
 				String start = result.getString("start");
-				if(startTime.equals(start)) {
+				String end = result.getString("end");
+				if(betweenTime(startTime, start, end)) {
 					return false;
 				}
 			}

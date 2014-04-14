@@ -43,7 +43,7 @@ public class ReasonableCare {
 	}
 	
 	// create a person in the db
-	public static void createPerson(int id, String name, int age, char gender, String phone, String address) {
+	public static int createPerson(int id, String name, int age, char gender, String phone, String address) {
 		try {
 			int rows = statement.executeUpdate("INSERT INTO person(id, name, age, gender, "
 					+ "phone_num, address) VALUES (" + id + ", " + name + ", " + age + ", " +
@@ -51,6 +51,38 @@ public class ReasonableCare {
 			if(rows == 0){
 				System.out.println("The person could not be created using the information provided.");
 			}
+			return rows;
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+		return 0;
+	}
+	
+	// create a student
+	public static void createStudent(int id, String name, int age, char gender, String phone, String address, String dateOfBirth, String ssn, int vacc) {
+		try {
+			connection.setAutoCommit(false);
+		
+			int status = createPerson(id, name, age, gender, phone, address);
+
+			int rows = statement.executeUpdate("INSERT INTO student(id, date_of_birth, ssn, vacc)"
+					+ " VALUES (" + id + ", to_date(" + dateOfBirth + ", 'DD-MON-YYYY'), " +ssn +
+					"," + vacc + ")");
+			if(rows == 1 && status == 1) {
+				connection.commit();
+				System.out.println("The student entry has been created in the database.");
+
+			}
+			else {
+				System.out.println("The student could not be created using the information provided.");
+				connection.rollback();
+			}
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+		
+		try {
+			connection.setAutoCommit(true);
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 		}
@@ -84,24 +116,6 @@ public class ReasonableCare {
 			}
 			else{
 				System.out.println("The doctor entry has been created in the database.");
-			}
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-		}
-	}
-	
-	// create a student
-	public static void createStudent(int id, String name, int age, char gender, String phone, String address, String dateOfBirth, String ssn, int vacc) {
-		createPerson(id, name, age, gender, phone, address);
-		try {
-			int rows = statement.executeUpdate("INSERT INTO student(id, date_of_birth, ssn, vacc)"
-					+ " VALUES (" + id + ", to_date(" + dateOfBirth + ", 'DD-MON-YYYY'), " +ssn +
-					"," + vacc + ")");
-			if(rows == 0){
-				System.out.println("The student could not be created using the information provided.");
-			}
-			else{
-				System.out.println("The student entry has been created in the database.");
 			}
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());

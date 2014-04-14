@@ -443,14 +443,22 @@ public class ReasonableCare {
 		}
 	}
 	
-	// determine if all vaccinations have been completed by the end of the first semester
-	public void showHolds(int studentID) throws SQLException {
+	// determine if all vaccinations have been completed
+	public static void showHolds(int studentID) throws SQLException {
 		result = statement.executeQuery("SELECT * FROM STUDENT WHERE id = " + studentID);
 		
 		if(result.next()) {
-			if(result.getInt("vacc") < 3) {
-				System.out.println("Holds: Vaccinations Are Behind");
+			System.out.println("------------------------------------------------------");
+
+			int num = result.getInt("vacc");
+			if(num < 3) {
+				System.out.println("Hold: You have only " + num + " of 3 vaccinations" );
 			}
+			else {
+				System.out.println("You have no holds.");
+			}
+			System.out.println("------------------------------------------------------");
+
 		}
 	}
 	
@@ -697,9 +705,28 @@ public class ReasonableCare {
 		}
 	}
 	
+	//method for deleting an appointment's corresponding billing statement
+	public static void deleteBillingStatement(int s_id, String date, String time) {
+		try {
+			String query = "SELECT id FROM appointment WHERE s_id=" + s_id + " AND appt_date=to_date('" + date + "', 'DD-MON-YYYY') AND " +
+				"start_time=to_date('" + time + "', 'HH:MIPM')";
+			result = statement.executeQuery(query);
+
+			if(result.next()){
+				int appt_id = result.getInt("id");
+				String update = "DELETE FROM billing_info WHERE appt_id = " + appt_id;
+				int rows = statement.executeUpdate(update);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	//method for cancelling an upcoming appointment
 	public static void cancelAppointment(int student_id, String date, String start_time){
 		try{
+			deleteBillingStatement(student_id, date, start_time);
 			String update = "DELETE FROM appointment WHERE s_id=" + student_id +
 					" AND appt_date=to_date('" + date + "', 'DD-MON-YYYY') AND start_time=" +
 					"to_date('" + start_time + "', 'HH:MIPM') AND to_date(sysdate,"
@@ -916,7 +943,7 @@ public class ReasonableCare {
 			statement.executeUpdate("CREATE TABLE student(id INT PRIMARY KEY, date_of_birth DATE NOT NULL, ssn VARCHAR(11), vacc INT NOT NULL, FOREIGN KEY (id) REFERENCES person(id) ON DELETE CASCADE)");
 			statement.executeUpdate("CREATE TABLE appointment(id INT PRIMARY KEY, s_id INT, staff_id INT, reason VARCHAR(30) NOT NULL, appt_date DATE NOT NULL, start_time DATE NOT NULL, end_time DATE NOT NULL, amt_billed FLOAT NOT NULL, notes VARCHAR(100), FOREIGN KEY (s_id) REFERENCES student(id), FOREIGN KEY (staff_id) REFERENCES staff(id))");
 			statement.executeUpdate("CREATE TABLE medical_record(appt_id INT PRIMARY KEY, s_id INT, d_id INT, start_date DATE NOT NULL, end_date DATE, prescription VARCHAR(30) NOT NULL, diagnosis VARCHAR(30) NOT NULL, FOREIGN KEY (appt_id) REFERENCES appointment(id) ON DELETE CASCADE, FOREIGN KEY (s_id) REFERENCES student(id) ON DELETE CASCADE, FOREIGN KEY (d_id) REFERENCES doctor(id) ON DELETE CASCADE)");
-			statement.executeUpdate("CREATE TABLE billing_info(s_id INT PRIMARY KEY, appt_id INT, billing_addr VARCHAR(100) NOT NULL, card_type VARCHAR(1) NOT NULL, card_num VARCHAR(19) NOT NULL, card_company VARCHAR(30) NOT NULL, FOREIGN KEY(s_id) REFERENCES student(id), FOREIGN KEY (appt_id) REFERENCES appointment(id))");
+			statement.executeUpdate("CREATE TABLE billing_info(s_id INT, appt_id INT PRIMARY KEY, billing_addr VARCHAR(100) NOT NULL, card_type VARCHAR(1) NOT NULL, card_num VARCHAR(19) NOT NULL, card_company VARCHAR(30) NOT NULL, FOREIGN KEY(s_id) REFERENCES student(id), FOREIGN KEY (appt_id) REFERENCES appointment(id))");
 			statement.executeUpdate("CREATE TABLE health_insurance(s_id INT PRIMARY KEY, ins_name VARCHAR(30) NOT NULL, policy_num VARCHAR(30) NOT NULL, start_date DATE NOT NULL, end_date DATE NOT NULL, copayment FLOAT NOT NULL, FOREIGN KEY (s_id) REFERENCES student(id))");
 			statement.executeUpdate("CREATE TABLE doctor_schedule(d_id INT PRIMARY KEY, days_available VARCHAR(5) NOT NULL, start_time DATE NOT NULL, end_time DATE NOT NULL, FOREIGN KEY (d_id) REFERENCES doctor(id))");
 			statement.executeUpdate("CREATE TABLE login(id INT PRIMARY KEY, pwd VARCHAR(10) NOT NULL, permissions VARCHAR(1) NOT NULL, FOREIGN KEY (id) REFERENCES person(id))");

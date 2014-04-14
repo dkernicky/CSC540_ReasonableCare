@@ -49,6 +49,7 @@ public class DoctorNurse {
 	public void getMedicalRecords(Scanner input){
 		System.out.println("Please enter the student's ID for whom you wish to get medical records:");
 		int s_id = input.nextInt();
+		input.nextLine();
 		ReasonableCare.displayMedicalRecords(s_id);
 	}
 	
@@ -100,9 +101,8 @@ public class DoctorNurse {
 	
 	public void viewPastDoctors(Scanner input){
 		System.out.println("Please enter the ID of the student for whom you would like to view past doctors:");
-		String s_string = input.nextLine();
-		int s_id = Integer.parseInt(s_string);
-		//int s_id = input.nextInt();
+		int s_id = input.nextInt();
+		input.nextLine();
 		ReasonableCare.viewPastDoctorInfo(s_id);
 	}
 	

@@ -416,6 +416,9 @@ public class ReasonableCare {
 	
 	public static boolean doctorAvailable(int id, String date) throws SQLException {
 		try{
+			char day = getDayOfWeek(date);
+			String query = "SELECT * FROM doctor_schedule WHERE d_id=" + id + " AND days_available LIKE '%" + day + "%'";
+			result = statement.executeQuery(query);
 			if(result.next()){
 				return true;
 			}
@@ -756,14 +759,15 @@ public class ReasonableCare {
 		try{
 			String query = "SELECT id FROM appointment WHERE s_id=" + s_id + " AND staff_id=" +
 					staff_id + " AND appt_date=to_date('" + appt_date + "', 'DD-MON-YYYY') AND " +
-					"start_time=to_date)'" + appt_time + "', 'HH:MIPM')";
+					"start_time=to_date('" + appt_time + "', 'HH:MIPM')";
 			result = statement.executeQuery(query);
 			if(result.next()){
 				int appt_id = result.getInt("id");
-				String insert = "INSERT INTO medical_record(appt_id, s_id, staff_id, start_date, " +
+				String insert = "INSERT INTO medical_record(appt_id, s_id, d_id, start_date, " +
 						"end_date, prescription, diagnosis) VALUES (" + appt_id + ", " + s_id +
-						", " + staff_id + ", " + start_date + ", " + end_date + ", " + prescription +
-						", " + diagnosis;
+						", " + staff_id + ", to_date('" + start_date + "', 'DD-MON-YYYY'), "
+						+ "to_date('" + end_date + "', 'DD-MON-YYYY'), '" + prescription +
+						"', '" + diagnosis + "'";
 				int rows = statement.executeUpdate(insert);
 				if(rows == 0){
 					System.out.println("There was an issue entering the given information.");

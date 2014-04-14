@@ -241,6 +241,46 @@ public class ReasonableCare {
 		}
 	}
 	
+	// create an appointment with billing info
+	public static void createAppointmentWithBilling(int studentID, int staffID, String reason, String date, String start, String notes, String addr, String type, String num, String company) {
+		try {
+			//create the appointment entry
+			float amtBilled = 50;
+			int rows = statement.executeUpdate("INSERT INTO appointment(id, s_id, staff_id, "
+					+ "reason, appt_date, start_time, end_time, amt_billed, notes) VALUES "
+					+ "(appointment_seq.nextVal, " + studentID + ", " + staffID + ", '" + reason
+					+ "', to_date('" + date + "', 'DD-MON-YYYY'), to_date('" + start + "', "
+					+ "'HH:MIPM'), to_date('" + start +"', 'HH:MIPM') + 1/24, " + amtBilled +
+					", '" + notes + "')");
+			if(rows == 0){
+				System.out.println("The appointment could not be created with the information provided.");
+			}
+			else{
+				System.out.println("The appointment has been created.");
+			}
+			//get the appointment entry that was created
+			String query = "SELECT id FROM appointment WHERE s_id=" + studentID + " AND appt_date=to_date('" + date + "', 'DD-MON-YYYY') AND " +
+					"start_time=to_date('" + start + "', 'HH:MIPM')";
+			result = statement.executeQuery(query);
+			if(result.next()){
+				int appt_id = result.getInt("id");
+				//create the billing statement
+				String insert = "INSERT INTO billing_info(s_id, appt_id, billing_addr, card_type, card_num, card_company) VALUES ( " +
+						studentID + ", " + appt_id + ", '" + addr + "', '" + type + "', '" + num + "', '" + company + "')";
+				
+				rows = statement.executeUpdate(insert);
+				if(rows == 0){
+					System.out.println("There was an issue entering the given information.");
+				}
+			}
+			else{
+				System.out.println("Some of the information provided was invalid.");
+			}
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+	
 	// create an appointment
 	public static void createAppointment(int studentID, int staffID, String reason, String date, String start, String notes) {
 		try {

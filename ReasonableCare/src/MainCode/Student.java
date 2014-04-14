@@ -180,10 +180,7 @@ public class Student {
 		// dummy method to verify payment
 		boolean verified = ReasonableCare.verifyPayment(type, num, company, address, expDate);
 		if(verified) {
-			//ReasonableCare.createAppointment(id, dID, reason, date, time, "N/A", amt, "");
-			ReasonableCare.createAppointment(studentID, dID, reason, date, time, "");
-			ReasonableCare.createBillingStatement(id, date, time, address, type, num, company);
-			System.out.println("Your appointment was successfully saved.");
+			ReasonableCare.createAppointmentWithBilling(studentID, dID, reason, date, time, "", address, type, num, company);
 		}
 	}
 	

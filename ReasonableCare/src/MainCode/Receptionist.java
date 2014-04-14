@@ -288,11 +288,7 @@ public class Receptionist {
 			break;
 			}
 		} // end loop
-		
-		try {
-		    ReasonableCare.updateStudent(studentID, name, age, genderChar, phone, address, dateOfBirth, ssn, vaccNum);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		 ReasonableCare.updateStudent(studentID, name, age, genderChar, phone, address, dateOfBirth, ssn, vaccNum);
+
 	}
 }

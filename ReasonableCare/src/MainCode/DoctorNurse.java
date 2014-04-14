@@ -86,7 +86,7 @@ public class DoctorNurse {
 		String e_time = input.nextLine();
 		System.out.println("Please enter any notes for the consultation:");
 		String note = input.nextLine();
-		ReasonableCare.createAppointment(s_id, id, "Consultation", date, s_time, e_time, 0, note);
+		ReasonableCare.createAppointment(s_id, id, "Consultation", date, s_time, note);
 	}
 	
 	public void generatePrescription(){

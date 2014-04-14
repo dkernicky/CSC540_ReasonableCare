@@ -164,7 +164,7 @@ public class Student {
 		System.out.println("Enter a specialization to search by:");
 		String s = input.nextLine();
 		System.out.println("Your search returned the following doctors:");
-		ReasonableCare.studentSearchForSpecialist(s);
+		ReasonableCare.searchForSpecialist(s);
 	}
 	
 }

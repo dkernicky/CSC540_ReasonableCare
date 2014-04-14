@@ -122,7 +122,7 @@ public class ReasonableCare {
 		}
 	}
 	
-	public void createInsuranceInfo(int studentID, String insName, String policyNum, String start, String end, float copayment) throws SQLException {
+	public static void createInsuranceInfo(int studentID, String insName, String policyNum, String start, String end, float copayment){
 		try{
 			int rows = statement.executeUpdate("INSERT INTO health_insurance(s_id, ins_name, "
 					+ "policy_num, start_date, end_date, copayment) VALUES (" + studentID + ", "
@@ -226,13 +226,18 @@ public class ReasonableCare {
 		}
 	}
 	
-	public static void updateInsuranceInfo(int studentID, String insName, String policyNum){
+	public static void updateInsuranceInfo(int studentID, String insName, String policyNum, String start, String end, float copayment){
 		try{
-			String start = "13-APR-2014";
-			String end = "15-APR-2016";
+			if(start == null || start.isEmpty()) 
+				start = "13-APR-2014";
+			if(end == null || end.isEmpty()) 
+				end = "15-APR-2016";
+			if(copayment == 0)
+				copayment = 30;
+			
 			int rows = statement.executeUpdate("UPDATE health_insurance set ins_name = " + 
 					insName + ", policy_num = " + policyNum + ", start_date = " + start + ", "
-					+ "end_date =" + end + ", copayment = " + 30.0 + " WHERE s_id = " + studentID);
+					+ "end_date =" + end + ", copayment = " + copayment + " WHERE s_id = " + studentID);
 			if(rows == 0){
 				System.out.println("Invalid insurance information provided.");
 			}

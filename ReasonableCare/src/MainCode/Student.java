@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 public class Student {
 	private static int id;
+	private enum Operation {CREATE, UPDATE};
 	
 	public static void runStudentScenario(int s_id) throws SQLException {
 		Scanner input = new Scanner(System.in);
@@ -19,54 +20,78 @@ public class Student {
 		System.out.println("7.  Search for a doctor");
 		System.out.println("8.  View holds");
 		System.out.println("9.  View billing information");
-		System.out.println("10. Update billing information");
+		//System.out.println("10. Update billing information");
 		
 		int choice = input.nextInt();
 		switch(choice) {
 			case 1:	runAppointmentScenario(id);
 			break;
-			case 2:	viewUpcomingAppointments();
+			case 2:	viewUpcomingAppointments(id);
 			break;
-			case 3:	viewPastAppointments();
+			case 3:	viewPastAppointments(id);
 			break;
-			case 4:	viewInsuranceInformation();
+			case 4:	viewInsuranceInformation(id);
 			break;
-			case 5: cancelAppointment();
+			case 5: cancelAppointment(id);
 			break;
-			case 6:	updateInsuranceInformation();
+			case 6:	updateInsuranceInformation(id);
 			break;
 			case 7:	runDoctorSearchScenario();
 			break;
-			case 8:	viewHolds();
+			case 8:	viewHolds(id);
 			break;
-			case 9:	viewBillingInfo();
+			case 9:	viewBillingInfo(id);
 			break;
 		}
 	}
 
-	private static void cancelAppointment() {
+	public static void cancelAppointment(int studentID) {
 		Scanner input = new Scanner(System.in);
 		System.out.println("Please enter the date of the appointment you wish to cancel:");
 		String date = input.nextLine();
 		System.out.println("Please enter the start time of the appointment you wish to cancel:");
 		String time = input.nextLine();
-		ReasonableCare.cancelAppointment(id, date, time);
+		ReasonableCare.cancelAppointment(studentID, date, time);
 		System.out.println("Your appointment was successfully cancelled.");
 
 	}
 	
-	private static void viewHolds() {
+	public static void viewHolds(int studentID) {
 		System.out.println("You have a hold on your account, lacking the required vaccinations.");
 		System.out.println("You have no holds on your account.");
 	}
 	
-	private static void updateInsuranceInformation() throws SQLException {
+	public static void createInsuranceInformation(int studentID) {
+		System.out.println("Creating insurance info.");
+		createOrUpdateInsuranceInfo(studentID, Operation.CREATE);
+	}	
+	
+	public static void updateInsuranceInformation(int studentID) {
+		System.out.println("Updating insurance info.");
+		createOrUpdateInsuranceInfo(studentID, Operation.UPDATE);
+	}
+	
+	private static void createOrUpdateInsuranceInfo(int studentID, Operation op){
 		Scanner input = new Scanner(System.in);
-		System.out.println("Please enter your insurance company's name:");
-		String name = input.nextLine();
-		System.out.println("Please enter your policy number:");
-		String num = input.nextLine();
-		ReasonableCare.updateInsuranceInfo(id, name, num);
+		System.out.println("Please enter insurance company's name:");
+		String insName = input.nextLine();
+		
+		System.out.println("Please enter policy number:");
+		String policyNum = input.nextLine();
+		
+		System.out.println("Please enter policy start date:");
+		String start = input.nextLine();
+		
+		System.out.println("Please enter policy end date:");
+		String end = input.nextLine();
+		
+		System.out.println("Please enter student copayment:");
+		float copayment = input.nextFloat();
+		
+		if (op == Operation.CREATE)
+			ReasonableCare.createInsuranceInfo(studentID, insName, policyNum, start, end, copayment);
+		else
+			ReasonableCare.updateInsuranceInfo(studentID, insName, policyNum, start, end, copayment);
 	}
 	
 	public static void runAppointmentScenario(int studentID) throws SQLException {
@@ -141,22 +166,23 @@ public class Student {
 		}
 	}
 	
-	private static void viewBillingInfo() {
-		
+	public static void viewBillingInfo(int studentID) {
+		System.out.println("(this view is not yet unimplemented)");
 	}
 	
-	private static void viewUpcomingAppointments() throws SQLException {
+	public static void viewUpcomingAppointments(int studentID) throws SQLException {
 		System.out.println("Here are your current appointments:");
-		ReasonableCare.viewUpcomingAppointmentInfo(id);
+		ReasonableCare.viewUpcomingAppointmentInfo(studentID);
 	}
 	
-	private static void viewPastAppointments() throws SQLException {
+	public static void viewPastAppointments(int studentID) throws SQLException {
 		System.out.println("Here are your past appointments:");
-		ReasonableCare.viewPastAppointmentInfo(id);
+		ReasonableCare.viewPastAppointmentInfo(studentID);
 	}
 	
-	private static void viewInsuranceInformation() {
+	private static void viewInsuranceInformation(int studentID) {
 		System.out.println("Your current insurance information is:");
+		System.out.println("(this view is not yet unimplemented)");
 	}
 	
 	private static void runDoctorSearchScenario() {

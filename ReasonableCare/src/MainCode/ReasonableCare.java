@@ -23,6 +23,9 @@ public class ReasonableCare {
 		//start();
 		//DoctorNurse test = new DoctorNurse();
 		//test.runDoctorNurseScenario(10001);
+<<<<<<< HEAD
+		Student.runStudentScenario(1102140001);
+=======
 		//Student.runStudentScenario(1102140001);
 		
 		char role = 'R'; // this value will be returned from a query on user id
@@ -36,6 +39,7 @@ public class ReasonableCare {
 					}
 			break;
 		}
+>>>>>>> e9363c16133958c773fe8e00f3bd581fabb0b7e7
 		close();
 	}
 	
@@ -302,7 +306,7 @@ public class ReasonableCare {
 			String appt_date = result.getString("appt_date");
 			String start_time = result.getString("start_time");
 			String end_time = result.getString("end_time");
-			float amt_billed = result.getFloat("amt_owed");
+			float amt_billed = result.getFloat("amt_billed");
 			String notes = result.getString("notes");
 			System.out.println("Staff ID: " + staff_id);
 			System.out.println("Reason for visit: " + reason);
@@ -329,7 +333,7 @@ public class ReasonableCare {
 			String appt_date = result.getString("appt_date");
 			String start_time = result.getString("start_time");
 			String end_time = result.getString("end_time");
-			float amt_billed = result.getFloat("amt_owed");
+			float amt_billed = result.getFloat("amt_billed");
 			String notes = result.getString("notes");
 			System.out.println("Staff ID: " + staff_id);
 			System.out.println("Reason for visit: " + reason);
@@ -528,12 +532,24 @@ public class ReasonableCare {
 	
 	public static void searchForSpecialist(String specialization){
 		try{
-			String query = "SELECT person.name as name, staff.id as staff_id, staff.department "
-					+ "as specialization, person.phone_num as phone, doctor_schedule.days_available"
-					+ " as availability, doctor_schedule.start_time as start_time, doctor_schedule.end_time"
-					+ " as end_time FROM staff INNER JOIN person ON staff.id=person.id INNER JOIN "
-					+ "doctor_schedule ON staff.id=doctor_schedule.d_id WHERE specialization='"
-					+ specialization + "'";
+			String query = "";
+			if(specialization.equals("")) {
+				// constructing SQL statement to return all doctors if specialization is not supplied
+				query = "SELECT person.name as name, staff.id as staff_id, staff.department "
+						+ "as specialization, person.phone_num as phone, doctor_schedule.days_available"
+						+ " as availability, doctor_schedule.start_time as start_time, doctor_schedule.end_time"
+						+ " as end_time FROM staff INNER JOIN person ON staff.id=person.id INNER JOIN "
+						+ "doctor_schedule ON staff.id=doctor_schedule.d_id";
+			}
+			else {
+				// constructing SQL statement to return doctors whose departments match spcialization string
+				query = "SELECT person.name as name, staff.id as staff_id, staff.department "
+						+ "as specialization, person.phone_num as phone, doctor_schedule.days_available"
+						+ " as availability, doctor_schedule.start_time as start_time, doctor_schedule.end_time"
+						+ " as end_time FROM staff INNER JOIN person ON staff.id=person.id INNER JOIN "
+						+ "doctor_schedule ON staff.id=doctor_schedule.d_id WHERE department='"
+						+ specialization + "'";
+			}
 			result = statement.executeQuery(query);
 			System.out.println();
 			System.out.println("------------------------------------------------------");

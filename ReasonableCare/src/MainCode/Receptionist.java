@@ -191,11 +191,7 @@ public class Receptionist {
 		System.out.println("Please enter the student ID:");
 		int studentID = input.nextInt(); input.nextLine();
 		
-		try {
-			Student.runAppointmentScenario(studentID);
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-		}
+		Student.runAppointmentScenario(studentID);
 	}
 
 	public static void createOrUpdateStudentAccount(Operation op){

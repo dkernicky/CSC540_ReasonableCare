@@ -7,8 +7,7 @@ public class Student {
 	private enum Operation {CREATE, UPDATE};
 	
 	// run the student scenario, providing choices and choosing appropriate responses based on user input
-	public static void runStudentScenario(int s_id) throws SQLException {
-		Scanner input = new Scanner(System.in);
+	public static void runStudentScenario(Scanner input, int s_id) throws SQLException {
 		id = s_id;
 		
 		System.out.println("Please select an option:");
@@ -25,7 +24,7 @@ public class Student {
 		
 		int choice = input.nextInt();
 		switch(choice) {
-			case 1:	runAppointmentScenario(id);
+			case 1:	runAppointmentScenario(input, id);
 			break;
 			case 2:	viewUpcomingAppointments(id);
 			break;
@@ -33,30 +32,27 @@ public class Student {
 			break;
 			case 4:	viewInsuranceInformation(id);
 			break;
-			case 5: cancelAppointment(id);
+			case 5: cancelAppointment(input, id);
 			break;
-			case 6:	updateInsuranceInformation(id);
+			case 6:	updateInsuranceInformation(input, id);
 			break;
-			case 7:	runDoctorSearchScenario();
+			case 7:	runDoctorSearchScenario(input);
 			break;
 			case 8:	viewHolds(id);
 			break;
-			case 9:	viewBillingInfo(id);
+			case 9:	viewBillingInfo(input, id);
 			break;
 		}
-		input.close();
 	}
 
 	// ask the student to verify a date and start time for a past apppointment in order to cancel it
-	public static void cancelAppointment(int studentID) {
-		Scanner input = new Scanner(System.in);
+	public static void cancelAppointment(Scanner input, int studentID) {
 		System.out.println("Please enter the date of the appointment you wish to cancel:");
 		String date = input.nextLine();
 		System.out.println("Please enter the start time of the appointment you wish to cancel:");
 		String time = input.nextLine();
 		ReasonableCare.cancelAppointment(studentID, date, time);
 		System.out.println("Your appointment was successfully cancelled.");
-		input.close();
 
 	}
 	
@@ -67,20 +63,19 @@ public class Student {
 	}
 	
 	// call method to prompt user for insurance information and create it accordingly
-	public static void createInsuranceInformation(int studentID) {
+	public static void createInsuranceInformation(Scanner input, int studentID) {
 		System.out.println("Creating insurance info.");
-		createOrUpdateInsuranceInfo(studentID, Operation.CREATE);
+		createOrUpdateInsuranceInfo(input, studentID, Operation.CREATE);
 	}	
 	
 	// call method to prompt user for insurance information and update it accordingly
-	public static void updateInsuranceInformation(int studentID) {
+	public static void updateInsuranceInformation(Scanner input, int studentID) {
 		System.out.println("Updating insurance info.");
-		createOrUpdateInsuranceInfo(studentID, Operation.UPDATE);
+		createOrUpdateInsuranceInfo(input, studentID, Operation.UPDATE);
 	}
 	
 	// based on operation type, prompt user for insurance information and create/update it accordingly
-	private static void createOrUpdateInsuranceInfo(int studentID, Operation op){
-		Scanner input = new Scanner(System.in);
+	private static void createOrUpdateInsuranceInfo(Scanner input, int studentID, Operation op){
 		System.out.println("Please enter insurance company's name:");
 		String insName = input.nextLine();
 		
@@ -103,9 +98,7 @@ public class Student {
 	}
 	
 	// guide the student through the appointment creation process
-	public static void runAppointmentScenario(int studentID) {
-		Scanner input = new Scanner(System.in);
-
+	public static void runAppointmentScenario(Scanner input, int studentID) {
 		System.out.println("Enter a doctor's id (or 1 to return to the previous menu):");
 		int dID = input.nextInt();
 		input.nextLine();
@@ -121,7 +114,6 @@ public class Student {
 			System.out.println("Enter a date (DD-MON-YYYY) or 1 to return to previous menu:");
 			date = input.nextLine();
 			if (date.equals("1")){
-				input.close();
 				return;
 			}
 			try {
@@ -143,7 +135,6 @@ public class Student {
 			//TODO fix code to check for existence between times
 			time = input.nextLine();
 			if (time.equals("1")){
-				input.close();
 				return;
 			}
 			try {
@@ -192,8 +183,7 @@ public class Student {
 	}
 	
 	// get an appointment date and start time from the user to display their billing statement
-	public static void viewBillingInfo(int studentID) {
-		Scanner scan = new Scanner(System.in);
+	public static void viewBillingInfo(Scanner input, int studentID) {
 		System.out.println("Please enter an appointment date: ");
 		System.out.println("(this view is not yet unimplemented)");
 	}
@@ -217,13 +207,11 @@ public class Student {
 	}
 	
 	// get information to initialize the doctor search
-	private static void runDoctorSearchScenario() {
-		Scanner input = new Scanner(System.in);
+	private static void runDoctorSearchScenario(Scanner input) {
 		System.out.println("Enter a specialization to search by:");
 		String s = input.nextLine();
 		System.out.println("Your search returned the following doctors:");
 		ReasonableCare.searchForSpecialist(s);
-		input.close();
 	}
 	
 }

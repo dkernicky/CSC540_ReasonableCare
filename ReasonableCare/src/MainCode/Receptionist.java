@@ -252,7 +252,7 @@ public class Receptionist {
 		System.out.println("Please enter a gender (M/F):");
 		char gender = input.nextLine().toUpperCase().charAt(0);
 		
-		System.out.println("Please enter the student's DOB (DD-MMM-YYYY):");
+		System.out.println("Please enter the student's DOB (DD-MON-YYYY):");
 		String dateOfBirth = input.nextLine();
 		
 		System.out.println("Please enter the student's age:");

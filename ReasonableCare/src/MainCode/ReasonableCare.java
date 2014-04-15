@@ -59,9 +59,6 @@ public class ReasonableCare {
 	
 
 	
-	// **********************************************************
-	// ** Manage User Accounts **
-	
 	//verify login info entered by the user
 	public static char getLoginInfo(int id, String pwd){
 		try{
@@ -117,8 +114,8 @@ public class ReasonableCare {
 			String address, char permissions) {
 		try {
 			int rows = statement.executeUpdate("INSERT INTO person(id, name, age, gender, "
-					+ "phone_num, address) VALUES (" + id + ", " + name + ", " + age + ", " +
-					gender + ", " + phone + ", " + address +")");
+					+ "phone_num, address) VALUES (" + id + ", '" + name + "', " + age + ", '" +
+					gender + "', '" + phone + "', '" + address +"')");
 			if(rows == 0){
 				System.out.println("The person could not be created using the information provided.");
 			}
@@ -141,8 +138,8 @@ public class ReasonableCare {
 			int status = createPerson(id, name, age, gender, phone, address, 'S');
 
 			int rows = statement.executeUpdate("INSERT INTO student(id, date_of_birth, ssn, vacc)"
-					+ " VALUES (" + id + ", to_date(" + dateOfBirth + ", 'DD-MON-YYYY'), " +ssn +
-					"," + vacc + ")");
+					+ " VALUES (" + id + ", to_date('" + dateOfBirth + "', 'DD-MON-YYYY'), '" +ssn +
+					"', " + vacc + ")");
 			if(rows == 1 && status == 1) {
 				connection.commit();
 				System.out.println("The student entry has been created in the database.");
@@ -171,7 +168,7 @@ public class ReasonableCare {
 			else
 				createPerson(id, name, age, gender, phone, address, 'D');
 			int rows = statement.executeUpdate("INSERT INTO staff(id, job_title, department) "
-					+ "VALUES (" + 10001 + ", " + jobTitle + "," + department + ")");
+					+ "VALUES (" + 10001 + ", '" + jobTitle + "', '" + department + "')");
 			if(rows == 0){
 				System.out.println("The staff member could not be entered using the information provided.");
 			}
@@ -188,7 +185,7 @@ public class ReasonableCare {
 		try {
 			createStaff(id, name, age, gender, jobTitle, department, phone, address);
 			int rows = statement.executeUpdate("INSERT INTO doctor(id, professional_title) VALUES"
-					+ " (" + id + ", " + profTitle + ")");
+					+ " (" + id + ", '" + profTitle + "')");
 			if(rows == 0){
 				System.out.println("The doctor could not be created using the information provided.");
 			}
@@ -204,9 +201,9 @@ public class ReasonableCare {
 	public static void createInsuranceInfo(int studentID, String insName, String policyNum, String start, String end, float copayment){
 		try{
 			int rows = statement.executeUpdate("INSERT INTO health_insurance(s_id, ins_name, "
-					+ "policy_num, start_date, end_date, copayment) VALUES (" + studentID + ", "
-					+ insName + ", " + policyNum + ",  to_date(" + start + ", 'DD-MON-YYYY'), "
-					+ "to_date(" + end + ", 'DD-MON-YYYY'), " + copayment + ")");
+					+ "policy_num, start_date, end_date, copayment) VALUES (" + studentID + ", '"
+					+ insName + "', '" + policyNum + "',  to_date('" + start + "', 'DD-MON-YYYY'), "
+					+ "to_date('" + end + "', 'DD-MON-YYYY'), " + copayment + ")");
 			if(rows == 0){
 				System.out.println("This insurance information could not be entered.");
 			}

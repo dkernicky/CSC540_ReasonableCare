@@ -44,7 +44,7 @@ public class Student {
 			break;
 			case 9:	viewBillingInfo(id);
 			break;
-			case 10:loggedIn = false; // this is how we log out
+			case 10: loggedIn = false; // this is how we log out
 			break;
 		}
 		return loggedIn;
@@ -63,8 +63,7 @@ public class Student {
 	
 	// display holds if the student's vaccinations have not been completed
 	public static void viewHolds(int studentID) {
-		System.out.println("You have a hold on your account, lacking the required vaccinations.");
-		System.out.println("You have no holds on your account.");
+		ReasonableCare.showHolds(studentID);
 	}
 	
 	// call method to prompt user for insurance information and create it accordingly
@@ -87,10 +86,10 @@ public class Student {
 		System.out.println("Please enter policy number:");
 		String policyNum = input.nextLine();
 		
-		System.out.println("Please enter policy start date:");
+		System.out.println("Please enter policy start date (DD-MON-YYYY):");
 		String start = input.nextLine();
 		
-		System.out.println("Please enter policy end date:");
+		System.out.println("Please enter policy end date (DD-MON-YYYY):");
 		String end = input.nextLine();
 		
 		System.out.println("Please enter student copayment:");
@@ -186,7 +185,7 @@ public class Student {
 	
 	// get an appointment date and start time from the user to display their billing statement
 	public static void viewBillingInfo(int studentID) {
-		ReasonableCare.viewBillingInfo(id);
+		ReasonableCare.viewBillingInfo(studentID);
 	}
 	
 	// display upcoming appointments for the student

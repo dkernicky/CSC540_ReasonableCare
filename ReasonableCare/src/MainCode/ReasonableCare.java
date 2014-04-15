@@ -168,7 +168,7 @@ public class ReasonableCare {
 			else
 				createPerson(id, name, age, gender, phone, address, 'D');
 			int rows = statement.executeUpdate("INSERT INTO staff(id, job_title, department) "
-					+ "VALUES (" + 10001 + ", '" + jobTitle + "', '" + department + "')");
+					+ "VALUES (" + id + ", '" + jobTitle + "', '" + department + "')");
 			if(rows == 0){
 				System.out.println("The staff member could not be entered using the information provided.");
 			}
@@ -480,21 +480,25 @@ public class ReasonableCare {
 	}
 	
 	// determine if all vaccinations have been completed
-	public static void showHolds(int studentID) throws SQLException {
-		result = statement.executeQuery("SELECT * FROM STUDENT WHERE id = " + studentID);
-		
-		if(result.next()) {
-			System.out.println("------------------------------------------------------");
-
-			int num = result.getInt("vacc");
-			if(num < 3) {
-				System.out.println("Hold: You have only " + num + " of 3 vaccinations" );
+	public static void showHolds(int studentID){
+		try{
+			result = statement.executeQuery("SELECT * FROM STUDENT WHERE id = " + studentID);
+			
+			if(result.next()) {
+				System.out.println("------------------------------------------------------");
+	
+				int num = result.getInt("vacc");
+				if(num < 3) {
+					System.out.println("Hold: You have only " + num + " of 3 vaccinations" );
+				}
+				else {
+					System.out.println("You have no holds.");
+				}
+				System.out.println("------------------------------------------------------");
+	
 			}
-			else {
-				System.out.println("You have no holds.");
-			}
-			System.out.println("------------------------------------------------------");
-
+		} catch(SQLException e){
+			System.out.println(e.getMessage());
 		}
 	}
 	

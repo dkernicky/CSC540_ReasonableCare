@@ -47,10 +47,12 @@ public class ReasonableCare {
 				break;
 			case 'S':
 				while(loggedIn){
-					Student.runStudentScenario(input, loginID);
+					loggedIn = Student.runStudentScenario(input, loginID);
 				}
+				break;
 			default:
 				System.out.println("Login failed.");
+				break;
 		}
 		//close the database
 		close();

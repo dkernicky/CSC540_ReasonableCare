@@ -8,7 +8,6 @@ public class Student {
 	
 	// run the student scenario, providing choices and choosing appropriate responses based on user input
 	public static boolean runStudentScenario(Scanner input, int s_id) throws SQLException {
-		boolean loggedIn = true;
 		id = s_id;
 		
 		System.out.println("Please select an option:");
@@ -44,10 +43,12 @@ public class Student {
 			break;
 			case 9:	viewBillingInfo(id);
 			break;
-			case 10: loggedIn = false; // this is how we log out
-			break;
+			case 10: return false; // this is how we log out
+			default:
+				System.out.println("Invalid option.");
+				break;
 		}
-		return loggedIn;
+		return true;
 	}
 
 	// ask the student to verify a date and start time for a past apppointment in order to cancel it
